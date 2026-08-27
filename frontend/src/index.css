@@ -1,0 +1,72 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-slate-50 text-slate-800 font-sans;
+    color: #1E293B;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply tracking-tight font-semibold text-slate-900;
+  }
+}
+
+/* Indian Flag Tricolor Strip */
+.gov-tricolor-bar {
+  height: 4px;
+  background: linear-gradient(90deg, #FF9933 33.33%, #FFFFFF 33.33%, #FFFFFF 66.66%, #138808 66.66%);
+}
+
+/* Formal Government Portal Utilities */
+.gov-card {
+  @apply bg-white border border-slate-200 shadow-sm;
+}
+
+.gov-card-header {
+  @apply px-4 py-3 border-b border-slate-200 bg-slate-50 flex items-center justify-between font-semibold text-slate-800 text-sm;
+}
+
+.gov-table {
+  @apply w-full text-left text-xs sm:text-sm border-collapse;
+}
+
+.gov-table th {
+  @apply bg-slate-100 text-slate-700 font-semibold px-3 py-2.5 border-b border-slate-300 text-xs uppercase tracking-wider;
+}
+
+.gov-table td {
+  @apply px-3 py-2.5 border-b border-slate-200 text-slate-800;
+}
+
+.gov-table tr:hover {
+  @apply bg-orange-50/40;
+}
+
+.gov-btn-primary {
+  @apply bg-[#FF6B00] hover:bg-[#D9531E] text-white font-medium px-4 py-2 text-sm transition-colors duration-150 inline-flex items-center justify-center gap-1.5 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-1;
+}
+
+.gov-btn-secondary {
+  @apply bg-white hover:bg-slate-100 text-slate-700 font-medium px-4 py-2 text-sm border border-slate-300 transition-colors duration-150 inline-flex items-center justify-center gap-1.5;
+}
+
+/* Custom scrollbars for clean enterprise look */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #F1F5F9;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #CBD5E1;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94A3B8;
+}
