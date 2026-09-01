@@ -7,7 +7,7 @@ class AppConstants {
   static const String appName = 'BhoomiSetu';
   static const String appTagline = 'National Land Acquisition & Management System';
   static const String ministry = 'Ministry of Rural Development & Land Resources';
-  static const String appVersion = '1.0.0 (SIH Field Build #20260831.04)';
+  static const String appVersion = '1.0.1 (SIH Field Build #20260901.05)';
 
   // Demo Credentials (Match FastAPI Seed Users)
   static const String demoEmail = 'field.demo@example.com';
@@ -18,8 +18,8 @@ class AppConstants {
   static const String demoState = 'Maharashtra';
   static const String demoDistrict = 'Pune';
 
-  // Default API Base URL (LAN IPv4 for Backend)
-  static const String defaultApiBaseUrl = 'http://10.50.8.209:5000';
+  // Default API Base URL (ADB Reverse / Localhost)
+  static const String defaultApiBaseUrl = 'http://127.0.0.1:5000';
 
   // GPS Accuracy threshold in meters (threshold for warning banner)
   static const double gpsAccuracyThresholdMeters = 15.0;
