@@ -43,20 +43,20 @@ class FieldVisitModel {
 
   factory FieldVisitModel.fromJson(Map<String, dynamic> json) {
     return FieldVisitModel(
-      visitId: json['visitId'] as String? ?? json['visit_id'] as String? ?? '',
-      taskId: json['taskId'] as String? ?? json['task_id'] as String? ?? '',
-      parcelId: json['parcelId'] as String? ?? json['parcel_id'] as String? ?? '',
-      officerId: json['officerId'] as String? ?? json['officer_id'] as String? ?? '',
-      startTime: json['startTime'] as String? ?? json['start_time'] as String? ?? '',
+      visitId: (json['visitId'] ?? json['visit_id'] ?? json['id'])?.toString() ?? '',
+      taskId: (json['taskId'] ?? json['task_id'])?.toString() ?? '',
+      parcelId: (json['parcelId'] ?? json['parcel_id'])?.toString() ?? '',
+      officerId: (json['officerId'] ?? json['officer_id'] ?? json['field_officer_id'])?.toString() ?? '',
+      startTime: json['startTime'] as String? ?? json['start_time'] as String? ?? json['visit_start'] as String? ?? '',
       endTime: json['endTime'] as String? ?? json['end_time'] as String?,
       latitude: (json['latitude'] as num?)?.toDouble(),
       longitude: (json['longitude'] as num?)?.toDouble(),
-      gpsAccuracy: (json['gpsAccuracy'] as num?)?.toDouble() ?? (json['gps_accuracy'] as num?)?.toDouble(),
+      gpsAccuracy: (json['gpsAccuracy'] as num?)?.toDouble() ?? (json['gps_accuracy'] as num?)?.toDouble() ?? (json['accuracy_meters'] as num?)?.toDouble(),
       altitude: (json['altitude'] as num?)?.toDouble(),
       status: json['status'] as String? ?? 'IN_PROGRESS',
       remarks: json['remarks'] as String?,
       isConfirmed: json['isConfirmed'] == 1 || json['isConfirmed'] == true || json['is_confirmed'] == 1,
-      syncStatus: json['syncStatus'] as String? ?? json['sync_status'] as String? ?? 'PENDING',
+      syncStatus: (json['syncStatus'] ?? json['sync_status']) as String? ?? 'PENDING',
       inspection: json['inspection'] != null ? InspectionModel.fromJson(json['inspection'] as Map<String, dynamic>) : null,
       evidence: (json['evidence'] as List<dynamic>?)
               ?.map((e) => EvidenceModel.fromJson(e as Map<String, dynamic>))

@@ -51,6 +51,7 @@ async function loginUser(email, password) {
 
   return {
     token,
+    access_token: token,
     user: sanitizedUser
   };
 }

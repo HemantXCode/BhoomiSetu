@@ -14,7 +14,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Health check endpoint
-app.get('/api/health', (req, res) => {
+app.get(['/api/health', '/api/v1/health'], (req, res) => {
   res.status(200).json({
     status: 'UP',
     system: 'BhoomiSetu - Real-Time National Land Acquisition & Management System',
@@ -22,11 +22,11 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-// API Routes
-app.use('/api/auth', authRoutes);
-app.use('/api/projects', projectRoutes);
-app.use('/api/dashboard', dashboardRoutes);
-app.use('/api/geo', geoRoutes);
+// API Routes (support both /api and /api/v1)
+app.use(['/api/auth', '/api/v1/auth'], authRoutes);
+app.use(['/api/projects', '/api/v1/projects'], projectRoutes);
+app.use(['/api/dashboard', '/api/v1/dashboard'], dashboardRoutes);
+app.use(['/api/geo', '/api/v1/geo'], geoRoutes);
 
 // Error handling
 app.use(notFoundHandler);

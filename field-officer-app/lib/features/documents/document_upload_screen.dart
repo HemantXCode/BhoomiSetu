@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:file_picker/file_picker.dart';
@@ -36,14 +37,21 @@ class _DocumentUploadScreenState extends ConsumerState<DocumentUploadScreen> {
 
       if (result != null && result.isNotEmpty) {
         final picked = result.first;
+        int realSize = 102400;
+        if (picked.path != null && picked.path!.isNotEmpty) {
+          final localFile = File(picked.path!);
+          if (localFile.existsSync()) {
+            realSize = localFile.lengthSync();
+          }
+        }
         final doc = DocumentModel(
           documentId: 'DOC-${const Uuid().v4().substring(0, 8).toUpperCase()}',
           visitId: widget.visit.visitId,
           parcelId: widget.task.parcelId,
           fileName: picked.name,
           fileType: picked.name.split('.').last.toUpperCase(),
-          fileSizeBytes: 102400,
-          localFilePath: picked.path ?? 'mock_path/${picked.name}',
+          fileSizeBytes: realSize,
+          localFilePath: picked.path ?? '',
           uploadStatus: 'PENDING_UPLOAD',
           syncStatus: 'PENDING',
         );

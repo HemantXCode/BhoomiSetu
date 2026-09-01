@@ -27,22 +27,24 @@ class EvidenceModel {
     this.syncStatus = 'PENDING',
   });
 
+  String get fileName => localFilePath.isNotEmpty ? localFilePath.split(RegExp(r'[/\\]')).last : photoId;
+
   factory EvidenceModel.fromJson(Map<String, dynamic> json) {
     return EvidenceModel(
-      photoId: json['photoId'] as String? ?? json['photo_id'] as String? ?? '',
-      visitId: json['visitId'] as String? ?? json['visit_id'] as String? ?? '',
-      parcelId: json['parcelId'] as String? ?? json['parcel_id'] as String? ?? '',
-      officerId: json['officerId'] as String? ?? json['officer_id'] as String? ?? '',
+      photoId: (json['photoId'] ?? json['photo_id'])?.toString() ?? '',
+      visitId: (json['visitId'] ?? json['visit_id'])?.toString() ?? '',
+      parcelId: (json['parcelId'] ?? json['parcel_id'])?.toString() ?? '',
+      officerId: (json['officerId'] ?? json['officer_id'])?.toString() ?? '',
       timestamp: json['timestamp'] != null
-          ? DateTime.tryParse(json['timestamp'] as String) ?? DateTime.now()
+          ? DateTime.tryParse(json['timestamp'].toString()) ?? DateTime.now()
           : DateTime.now(),
       latitude: (json['latitude'] as num?)?.toDouble(),
       longitude: (json['longitude'] as num?)?.toDouble(),
       gpsAccuracy: (json['gpsAccuracy'] as num?)?.toDouble() ?? (json['gps_accuracy'] as num?)?.toDouble(),
       category: json['category'] as String? ?? 'Parcel Boundary',
       description: json['description'] as String?,
-      localFilePath: json['localFilePath'] as String? ?? json['local_file_path'] as String? ?? '',
-      syncStatus: json['syncStatus'] as String? ?? json['sync_status'] as String? ?? 'PENDING',
+      localFilePath: (json['localFilePath'] ?? json['local_file_path'] ?? json['file_path'] ?? json['filePath'])?.toString() ?? '',
+      syncStatus: (json['syncStatus'] ?? json['sync_status'])?.toString() ?? 'PENDING',
     );
   }
 

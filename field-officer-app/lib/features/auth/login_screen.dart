@@ -17,8 +17,8 @@ class LoginScreen extends ConsumerStatefulWidget {
 
 class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _emailController = TextEditingController(text: AppConstants.demoEmail);
-  final _passwordController = TextEditingController(text: AppConstants.demoPassword);
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
   bool _obscurePassword = true;
 
   @override
@@ -41,13 +41,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     }
   }
 
-  void _fillDemoCredentials() {
-    setState(() {
-      _emailController.text = AppConstants.demoEmail;
-      _passwordController.text = AppConstants.demoPassword;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     final authState = ref.watch(authControllerProvider);
@@ -57,13 +50,22 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
             child: Form(
               key: _formKey,
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
+                  // Settings Action
+                  Align(
+                    alignment: Alignment.topRight,
+                    child: IconButton(
+                      icon: const Icon(Icons.settings_outlined, color: AppColors.secondary),
+                      tooltip: 'Server & Gateway Settings',
+                      onPressed: () => Navigator.of(context).pushNamed(AppRoutes.settings),
+                    ),
+                  ),
                   // Government Header Branding
                   Center(
                     child: Container(
@@ -228,31 +230,29 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 16),
-
-                  // Demo Credentials Helper Chip
-                  OutlinedButton.icon(
-                    onPressed: _fillDemoCredentials,
-                    icon: const Icon(Icons.auto_fix_high, size: 16, color: AppColors.primary),
-                    label: const Text(
-                      'Use Demo Credentials (field.demo@bhoomisetu.gov.in)',
-                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.primary),
-                    ),
-                    style: OutlinedButton.styleFrom(
-                      side: BorderSide(color: AppColors.primary.withOpacity(0.4)),
-                      backgroundColor: Colors.white,
-                    ),
-                  ),
                   const SizedBox(height: 24),
 
-                  const Center(
-                    child: Text(
-                      'Ministry of Rural Development • Government of India',
-                      style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w500,
-                        color: AppColors.textMuted,
-                      ),
+                  Center(
+                    child: Column(
+                      children: [
+                        const Text(
+                          'Ministry of Rural Development • Government of India',
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w500,
+                            color: AppColors.textMuted,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          AppConstants.appVersion,
+                          style: const TextStyle(
+                            fontSize: 10,
+                            fontFamily: 'monospace',
+                            color: AppColors.textMuted,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],

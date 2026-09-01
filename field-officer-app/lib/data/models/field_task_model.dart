@@ -38,24 +38,44 @@ class FieldTaskModel {
   });
 
   factory FieldTaskModel.fromJson(Map<String, dynamic> json) {
+    final rawId = json['id']?.toString() ?? '';
+    final rawParcelId = (json['parcelId'] ?? json['parcel_id'])?.toString() ?? '';
+    final project = json['project'] as String? ?? json['project_name'] as String? ?? 'Pune Ring Road Express Corridor';
+    final village = json['village'] as String? ?? '';
+    final district = json['district'] as String? ?? json['district_name'] as String? ?? 'Pune';
+    final state = json['state'] as String? ?? json['state_name'] as String? ?? 'Maharashtra';
+    final surveyNumber = json['surveyNumber'] as String? ?? json['survey_number'] as String? ?? (rawParcelId.isNotEmpty ? 'Gat No. $rawParcelId' : '');
+    final landAreaSqM = (json['landAreaSqM'] as num?)?.toDouble() ??
+        (json['land_area_sqm'] as num?)?.toDouble() ??
+        (((json['area_hectares'] as num?)?.toDouble() ?? 0.0) * 10000.0);
+    final taskType = json['taskType'] as String? ?? json['task_type'] as String? ?? 'Survey & Verification';
+    final assignedDate = json['assignedDate'] as String? ?? json['assigned_date'] as String? ?? '';
+    final dueDate = json['dueDate'] as String? ?? json['due_date'] as String? ?? '';
+    final status = json['status'] as String? ?? 'PENDING';
+    final latitude = (json['latitude'] as num?)?.toDouble() ?? (json['target_latitude'] as num?)?.toDouble() ?? 18.5204;
+    final longitude = (json['longitude'] as num?)?.toDouble() ?? (json['target_longitude'] as num?)?.toDouble() ?? 73.8567;
+    final instructions = json['instructions'] as String? ?? 'Conduct field verification and ground parcel inspection.';
+    final remarks = json['remarks'] as String?;
+    final syncStatus = json['syncStatus'] as String? ?? json['sync_status'] as String? ?? 'SYNCED';
+
     return FieldTaskModel(
-      id: json['id'] as String? ?? '',
-      parcelId: json['parcelId'] as String? ?? json['parcel_id'] as String? ?? '',
-      project: json['project'] as String? ?? 'Pune Ring Road Express Corridor',
-      village: json['village'] as String? ?? '',
-      district: json['district'] as String? ?? 'Pune',
-      state: json['state'] as String? ?? 'Maharashtra',
-      surveyNumber: json['surveyNumber'] as String? ?? json['survey_number'] as String? ?? '',
-      landAreaSqM: (json['landAreaSqM'] as num?)?.toDouble() ?? (json['land_area_sqm'] as num?)?.toDouble() ?? 0.0,
-      taskType: json['taskType'] as String? ?? json['task_type'] as String? ?? 'Survey & Verification',
-      assignedDate: json['assignedDate'] as String? ?? json['assigned_date'] as String? ?? '',
-      dueDate: json['dueDate'] as String? ?? json['due_date'] as String? ?? '',
-      status: json['status'] as String? ?? 'PENDING',
-      latitude: (json['latitude'] as num?)?.toDouble() ?? 0.0,
-      longitude: (json['longitude'] as num?)?.toDouble() ?? 0.0,
-      instructions: json['instructions'] as String? ?? '',
-      remarks: json['remarks'] as String?,
-      syncStatus: json['syncStatus'] as String? ?? json['sync_status'] as String? ?? 'SYNCED',
+      id: rawId,
+      parcelId: rawParcelId,
+      project: project,
+      village: village,
+      district: district,
+      state: state,
+      surveyNumber: surveyNumber,
+      landAreaSqM: landAreaSqM,
+      taskType: taskType,
+      assignedDate: assignedDate,
+      dueDate: dueDate,
+      status: status,
+      latitude: latitude,
+      longitude: longitude,
+      instructions: instructions,
+      remarks: remarks,
+      syncStatus: syncStatus,
     );
   }
 

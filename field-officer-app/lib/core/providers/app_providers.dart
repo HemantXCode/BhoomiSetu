@@ -3,6 +3,7 @@ import '../storage/secure_storage_service.dart';
 import '../storage/database_helper.dart';
 import '../network/api_client.dart';
 import '../network/api_config.dart';
+import '../constants/app_constants.dart';
 import '../../services/connectivity_service.dart';
 import '../../services/location_service.dart';
 import '../../services/camera_service.dart';
@@ -12,6 +13,9 @@ import '../../data/repositories/task_repository.dart';
 import '../../data/repositories/sync_repository.dart';
 import '../../data/repositories/field_visit_repository.dart';
 import '../../data/repositories/notification_repository.dart';
+
+// Reactive Data Mode Provider
+final dataModeProvider = StateProvider<DataMode>((ref) => ApiConfig.dataMode);
 
 // Storage & Services
 final secureStorageProvider = Provider<SecureStorageService>((ref) {
@@ -50,16 +54,22 @@ final syncRepositoryProvider = Provider<ISyncRepository>((ref) {
 final syncServiceProvider = Provider<SyncService>((ref) {
   final syncRepo = ref.watch(syncRepositoryProvider);
   final connectivity = ref.watch(connectivityServiceProvider);
-  final service = SyncService(syncRepository: syncRepo, connectivityService: connectivity);
+  final apiClient = ref.watch(apiClientProvider);
+  final service = SyncService(
+    syncRepository: syncRepo,
+    connectivityService: connectivity,
+    apiClient: apiClient,
+  );
   ref.onDispose(() => service.dispose());
   return service;
 });
 
 final authRepositoryProvider = Provider<IAuthRepository>((ref) {
+  final mode = ref.watch(dataModeProvider);
   final storage = ref.watch(secureStorageProvider);
   final apiClient = ref.watch(apiClientProvider);
 
-  if (ApiConfig.isMockMode) {
+  if (mode == DataMode.mock) {
     return MockAuthRepository(secureStorage: storage);
   } else {
     return ApiAuthRepository(apiClient: apiClient, secureStorage: storage);
@@ -67,10 +77,11 @@ final authRepositoryProvider = Provider<IAuthRepository>((ref) {
 });
 
 final taskRepositoryProvider = Provider<ITaskRepository>((ref) {
+  final mode = ref.watch(dataModeProvider);
   final dbHelper = ref.watch(dbHelperProvider);
   final apiClient = ref.watch(apiClientProvider);
 
-  if (ApiConfig.isMockMode) {
+  if (mode == DataMode.mock) {
     return MockTaskRepository(dbHelper: dbHelper);
   } else {
     return ApiTaskRepository(apiClient: apiClient, dbHelper: dbHelper);
@@ -78,12 +89,13 @@ final taskRepositoryProvider = Provider<ITaskRepository>((ref) {
 });
 
 final fieldVisitRepositoryProvider = Provider<IFieldVisitRepository>((ref) {
+  final mode = ref.watch(dataModeProvider);
   final dbHelper = ref.watch(dbHelperProvider);
   final syncRepo = ref.watch(syncRepositoryProvider);
   final apiClient = ref.watch(apiClientProvider);
 
   final mockRepo = MockFieldVisitRepository(dbHelper: dbHelper, syncRepository: syncRepo);
-  if (ApiConfig.isMockMode) {
+  if (mode == DataMode.mock) {
     return mockRepo;
   } else {
     return ApiFieldVisitRepository(apiClient: apiClient, localFallback: mockRepo);

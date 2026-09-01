@@ -1,5 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { dashboardService } from '../../services/dashboardService';
+import { fieldService } from '../../services/fieldService';
+import { documentService } from '../../services/documentService';
 import { useAuth } from '../../context/AuthContext';
 import DashboardLayout from '../../components/layout/DashboardLayout';
 import Breadcrumbs from '../../components/common/Breadcrumbs';
@@ -11,11 +13,20 @@ import {
   CheckCircle2, 
   Clock, 
   Smartphone, 
-  RefreshCw,
-  AlertCircle,
-  FileCheck,
-  Send,
-  Navigation
+  RefreshCw, 
+  AlertCircle, 
+  FileCheck, 
+  Send, 
+  Navigation, 
+  FileText, 
+  ShieldCheck, 
+  AlertTriangle,
+  ExternalLink,
+  Eye,
+  Download,
+  Image as ImageIcon,
+  Check,
+  X
 } from 'lucide-react';
 
 export default function FieldDashboard() {
@@ -23,14 +34,22 @@ export default function FieldDashboard() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [activeTab, setActiveTab] = useState('uploads'); // 'uploads', 'tasks', 'visits', 'verifications', 'audit'
+  const [selectedImage, setSelectedImage] = useState(null);
   const [selectedTask, setSelectedTask] = useState(null);
   const [remarks, setRemarks] = useState('');
   const [actionSuccess, setActionSuccess] = useState(null);
-  const [currentGps, setCurrentGps] = useState('18.5204° N, 73.8567° E (Pune Div)');
+  const [actionError, setActionError] = useState(null);
+  const [submitting, setSubmitting] = useState(false);
 
-  const fetchStats = async () => {
+  const photoInputRef = useRef(null);
+  const docInputRef = useRef(null);
+
+  const isVerified = user?.identity_status === 'VERIFIED';
+
+  const fetchStats = async (isBackground = false) => {
     try {
-      setRefreshing(true);
+      if (!isBackground) setRefreshing(true);
       const res = await dashboardService.getDashboardStats();
       if (res.success && res.data) {
         setData(res.data);
@@ -41,77 +60,146 @@ export default function FieldDashboard() {
     } catch (err) {
       console.error('Failed to load field officer stats:', err);
     } finally {
-      setLoading(false);
-      setRefreshing(false);
+      if (!isBackground) {
+        setLoading(false);
+        setRefreshing(false);
+      }
     }
   };
 
   useEffect(() => {
     fetchStats();
+    // Live background polling every 6 seconds to capture real-time phone uploads
+    const interval = setInterval(() => {
+      fetchStats(true);
+    }, 6000);
+    return () => clearInterval(interval);
   }, []);
 
-  const handleCaptureGps = () => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (pos) => {
-          const coords = `${pos.coords.latitude.toFixed(4)}° N, ${pos.coords.longitude.toFixed(4)}° E (Live GPS)`;
-          setCurrentGps(coords);
-          setActionSuccess('✅ High-precision GPS coordinates captured from device.');
-        },
-        () => {
-          setCurrentGps('18.5204° N, 73.8567° E (Fixed Cell Tower)');
-          setActionSuccess('ℹ️ Default GPS coordinate recorded.');
-        }
-      );
+  const handlePhotoUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!isVerified) {
+      setActionError('❌ IDENTITY_VERIFICATION_REQUIRED: Official personnel identity verification is pending with District Authority.');
+      return;
+    }
+
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      if (selectedTask?.task_id) {
+        formData.append('related_entity_id', selectedTask.task_id);
+      }
+
+      const res = await fieldService.uploadPhoto(formData);
+      if (res.success) {
+        setActionSuccess(`📸 Photo '${file.name}' successfully uploaded and indexed in PostgreSQL.`);
+        await fetchStats();
+      }
+    } catch (err) {
+      console.error('Failed to upload photo:', err);
+      setActionError('❌ Failed to upload photo.');
+    } finally {
+      setTimeout(() => { setActionSuccess(null); setActionError(null); }, 5000);
     }
   };
 
-  const handleQuickAction = (actionName) => {
-    setActionSuccess(`✅ Action '${actionName}' executed for ${selectedTask?.id || 'Task'}.`);
-    setTimeout(() => setActionSuccess(null), 4000);
-  };
+  const handleDocumentUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
 
-  const handleSubmitVerification = (e) => {
-    e.preventDefault();
-    setActionSuccess(`🎉 Field verification for [${selectedTask?.id} - ${selectedTask?.village}] successfully submitted to District Collectorate!`);
-    setRemarks('');
-    setTimeout(() => setActionSuccess(null), 5000);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('related_entity', 'FIELD_TASK');
+      if (selectedTask?.task_id) {
+        formData.append('related_entity_id', selectedTask.task_id);
+      }
+
+      const res = await documentService.uploadDocument(formData);
+      if (res.success) {
+        setActionSuccess(`📄 Document '${file.name}' persisted in PostgreSQL.`);
+        await fetchStats();
+      }
+    } catch (err) {
+      console.error('Failed to upload document:', err);
+      setActionError('❌ Failed to upload document.');
+    } finally {
+      setTimeout(() => { setActionSuccess(null); setActionError(null); }, 5000);
+    }
   };
 
   const summary = data?.summary || {};
   const tasks = data?.field_tasks || [];
-  const districtName = data?.district_name || user?.district_name || 'Assigned Field Division';
+  const mobileUploads = data?.mobile_uploads || [];
+  const fieldVisits = data?.field_visits || [];
+  const fieldVerifications = data?.field_verifications || [];
+  const recentActivities = data?.recent_activities || [];
+  const districtName = data?.district_name || user?.district_name || 'Pune Division';
 
   return (
     <DashboardLayout>
-      <Breadcrumbs items={[{ label: 'Field Operations', path: '/field/dashboard' }, { label: 'Mobile Field Officer Interface' }]} />
+      <Breadcrumbs items={[{ label: 'Field Operations', path: '/field/dashboard' }, { label: 'Field Officer Interface' }]} />
 
-      {/* Field Officer Banner */}
+      {/* Hidden file inputs */}
+      <input 
+        type="file" 
+        ref={photoInputRef} 
+        onChange={handlePhotoUpload} 
+        accept="image/*" 
+        className="hidden" 
+      />
+      <input 
+        type="file" 
+        ref={docInputRef} 
+        onChange={handleDocumentUpload} 
+        accept=".pdf,.png,.jpg,.jpeg" 
+        className="hidden" 
+      />
+
+      {/* Field Officer Banner with Official Identity Status */}
       <div className="bg-white border border-slate-200 p-4 rounded mb-5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
         <div>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <span className="bg-[#15803D] text-white text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider flex items-center gap-1">
               <Smartphone className="w-3 h-3" />
-              Mobile Field Unit
+              Connected Mobile Terminal
             </span>
-            <span className="text-xs text-slate-500 font-medium">• {districtName} Division</span>
+            <span className="text-xs text-slate-500 font-medium">• {districtName}</span>
+            <span className={`text-[10px] font-bold px-2 py-0.5 rounded flex items-center gap-1 ${
+              isVerified 
+                ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' 
+                : 'bg-amber-100 text-amber-800 border border-amber-300'
+            }`}>
+              {isVerified ? <ShieldCheck className="w-3 h-3 text-emerald-600" /> : <AlertTriangle className="w-3 h-3 text-amber-600" />}
+              Status: {user?.identity_status || 'VERIFIED'}
+            </span>
+            {user?.official_id_masked && (
+              <span className="text-[10px] font-mono bg-slate-100 text-slate-700 px-2 py-0.5 rounded border border-slate-200">
+                Official ID: {user.official_id_masked}
+              </span>
+            )}
           </div>
           <h2 className="text-lg sm:text-xl font-bold text-slate-900 mt-1">
-            Ground Inspection & Joint Measurement Portal
+            Ground Inspection & Mobile Evidence Hub
           </h2>
           <p className="text-xs text-slate-600">
-            Field Officer: <span className="font-bold text-slate-800">{user?.name}</span> • Ready for on-site boundary surveys.
+            Officer: <span className="font-bold text-slate-800">{user?.name}</span> • {user?.department || 'Department of Land Revenue'}
           </p>
         </div>
 
-        <button
-          onClick={fetchStats}
-          disabled={refreshing}
-          className="gov-btn-secondary text-xs w-full sm:w-auto"
-        >
-          <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? 'animate-spin text-orange-600' : ''}`} />
-          <span>Sync Assigned Tasks</span>
-        </button>
+        <div className="flex items-center gap-2 w-full sm:w-auto">
+          <button
+            onClick={() => fetchStats(false)}
+            disabled={refreshing}
+            className="gov-btn-secondary text-xs flex items-center gap-1.5"
+            title="Refresh latest records from Supabase PostgreSQL"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? 'animate-spin text-orange-600' : ''}`} />
+            <span>{refreshing ? 'Syncing...' : 'Sync / Refresh'}</span>
+          </button>
+        </div>
       </div>
 
       {actionSuccess && (
@@ -121,247 +209,455 @@ export default function FieldDashboard() {
         </div>
       )}
 
+      {actionError && (
+        <div className="mb-4 p-3 bg-rose-50 border border-rose-300 text-rose-900 rounded text-xs flex items-center gap-2 font-medium">
+          <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
+          <span>{actionError}</span>
+        </div>
+      )}
+
       {loading ? (
         <div className="py-16 text-center">
           <div className="w-8 h-8 border-3 border-orange-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
-          <p className="mt-3 text-xs font-semibold text-slate-600">Connecting to Field Division Server...</p>
+          <p className="mt-3 text-xs font-semibold text-slate-600">Connecting to Supabase PostgreSQL Database...</p>
         </div>
       ) : (
         <>
-          {/* Mobile-Friendly KPI Summary Cards */}
+          {/* KPI Summary Cards - Calculated directly from PostgreSQL */}
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5 mb-5">
             <StatCard
               title="Today's Tasks"
-              value={summary.todays_tasks || 0}
-              subtitle="Urgent on-site"
+              value={summary.todays_tasks ?? tasks.length}
+              subtitle="Assigned in PG"
               icon={Clock}
               colorScheme="orange"
             />
             <StatCard
               title="Pending Verification"
-              value={summary.pending_verification || 0}
-              subtitle="Inspection Queue"
+              value={summary.pending_verification ?? 0}
+              subtitle="On-Site Queue"
               icon={AlertCircle}
               colorScheme="amber"
             />
             <StatCard
-              title="Completed Parcels"
-              value={summary.completed_verification || 0}
-              subtitle="Verified & Uploaded"
+              title="Submitted Verifications"
+              value={summary.completed_verification ?? 0}
+              subtitle="Sent to CALA"
               icon={CheckCircle2}
               colorScheme="green"
             />
             <StatCard
-              title="Assigned Parcels"
-              value={summary.assigned_parcels || 0}
-              subtitle="Division Total"
+              title="Mobile Photos"
+              value={summary.uploaded_photos_count ?? 0}
+              subtitle="JPEG Evidence"
+              icon={Camera}
+              colorScheme="blue"
+            />
+            <StatCard
+              title="Land Records / PDFs"
+              value={summary.uploaded_documents_count ?? 0}
+              subtitle="7/12 Extracts"
+              icon={FileText}
+              colorScheme="indigo"
+            />
+            <StatCard
+              title="Field Visits"
+              value={summary.total_field_visits ?? 0}
+              subtitle="GNSS Sessions"
               icon={MapPin}
-              colorScheme="blue"
-            />
-            <StatCard
-              title="Assigned Projects"
-              value={summary.assigned_projects || 0}
-              subtitle="Linear Corridors"
-              icon={FileCheck}
-              colorScheme="blue"
-            />
-            <StatCard
-              title="Survey Accuracy"
-              value={summary.verification_accuracy || '100%'}
-              subtitle="QA Passed"
-              icon={CheckCircle2}
-              colorScheme="green"
+              colorScheme="slate"
             />
           </div>
 
-          {/* Main Field Interface: Tasks on Left, Active Action Panel on Right */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
-            
-            {/* Left: Task Queue (Touch-Friendly List) */}
-            <div className="lg:col-span-5 space-y-3">
-              <div className="gov-card p-3.5">
-                <div className="flex items-center justify-between pb-2 mb-3 border-b border-slate-200">
-                  <h3 className="font-bold text-xs uppercase tracking-wide text-slate-800">
-                    Assigned Inspection Tasks ({tasks.length})
+          {/* Navigation Tabs */}
+          <div className="flex border-b border-slate-200 mb-5 overflow-x-auto">
+            <button
+              onClick={() => setActiveTab('uploads')}
+              className={`pb-2.5 px-4 text-xs font-bold whitespace-nowrap transition-colors flex items-center gap-1.5 ${
+                activeTab === 'uploads'
+                  ? 'text-orange-600 border-b-2 border-orange-600'
+                  : 'text-slate-500 hover:text-slate-800'
+              }`}
+            >
+              <Smartphone className="w-3.5 h-3.5" />
+              Mobile Evidence & Uploads ({mobileUploads.length})
+            </button>
+            <button
+              onClick={() => setActiveTab('tasks')}
+              className={`pb-2.5 px-4 text-xs font-bold whitespace-nowrap transition-colors flex items-center gap-1.5 ${
+                activeTab === 'tasks'
+                  ? 'text-orange-600 border-b-2 border-orange-600'
+                  : 'text-slate-500 hover:text-slate-800'
+              }`}
+            >
+              <FileCheck className="w-3.5 h-3.5" />
+              Assigned Tasks ({tasks.length})
+            </button>
+            <button
+              onClick={() => setActiveTab('visits')}
+              className={`pb-2.5 px-4 text-xs font-bold whitespace-nowrap transition-colors flex items-center gap-1.5 ${
+                activeTab === 'visits'
+                  ? 'text-orange-600 border-b-2 border-orange-600'
+                  : 'text-slate-500 hover:text-slate-800'
+              }`}
+            >
+              <Navigation className="w-3.5 h-3.5" />
+              Field Visits & GPS ({fieldVisits.length})
+            </button>
+            <button
+              onClick={() => setActiveTab('verifications')}
+              className={`pb-2.5 px-4 text-xs font-bold whitespace-nowrap transition-colors flex items-center gap-1.5 ${
+                activeTab === 'verifications'
+                  ? 'text-orange-600 border-b-2 border-orange-600'
+                  : 'text-slate-500 hover:text-slate-800'
+              }`}
+            >
+              <CheckCircle2 className="w-3.5 h-3.5" />
+              Submitted Verifications ({fieldVerifications.length})
+            </button>
+            <button
+              onClick={() => setActiveTab('audit')}
+              className={`pb-2.5 px-4 text-xs font-bold whitespace-nowrap transition-colors flex items-center gap-1.5 ${
+                activeTab === 'audit'
+                  ? 'text-orange-600 border-b-2 border-orange-600'
+                  : 'text-slate-500 hover:text-slate-800'
+              }`}
+            >
+              <Clock className="w-3.5 h-3.5" />
+              Live Audit Trail ({recentActivities.length})
+            </button>
+          </div>
+
+          {/* TAB 1: RECENT MOBILE UPLOADS & EVIDENCE */}
+          {activeTab === 'uploads' && (
+            <div className="gov-card p-4">
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-4 pb-3 border-b border-slate-200">
+                <div>
+                  <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wide flex items-center gap-2">
+                    <Camera className="w-4 h-4 text-orange-600" />
+                    Recent Mobile Uploads & Field Evidence
                   </h3>
-                  <span className="text-[10px] text-slate-500">Select task to inspect</span>
+                  <p className="text-xs text-slate-500 mt-0.5">
+                    Live media files uploaded from the physical phone or web terminal and indexed in Supabase PostgreSQL.
+                  </p>
                 </div>
 
-                <div className="space-y-2.5">
-                  {tasks.map((task) => {
-                    const isSelected = selectedTask?.id === task.id;
-                    return (
-                      <div
-                        key={task.id}
-                        onClick={() => setSelectedTask(task)}
-                        className={`p-3 rounded border text-xs cursor-pointer transition-all ${
-                          isSelected
-                            ? 'bg-orange-50/80 border-[#FF6B00] shadow-xs'
-                            : 'bg-slate-50 hover:bg-white border-slate-200'
-                        }`}
-                      >
-                        <div className="flex justify-between items-start mb-1">
-                          <span className="font-bold font-mono text-slate-900 text-sm">{task.id}</span>
-                          <span className={`text-[10px] font-bold px-2 py-0.5 rounded ${
-                            task.priority === 'HIGH' ? 'bg-rose-100 text-rose-800' : 'bg-slate-200 text-slate-700'
-                          }`}>
-                            {task.priority}
-                          </span>
-                        </div>
-
-                        <div className="font-semibold text-slate-800">{task.village}</div>
-                        <div className="text-[11px] text-slate-600">{task.project_name}</div>
-                        <div className="text-[11px] text-orange-700 font-medium mt-1">
-                          Task: {task.task_type}
-                        </div>
-
-                        <div className="flex justify-between items-center text-[10px] text-slate-500 pt-2 mt-2 border-t border-slate-200/60">
-                          <span className="flex items-center gap-1 font-mono">
-                            <Navigation className="w-3 h-3 text-slate-400" />
-                            {task.gps_coords}
-                          </span>
-                          <span className="font-semibold text-amber-700">{task.due_date}</span>
-                        </div>
-                      </div>
-                    );
-                  })}
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => photoInputRef.current?.click()}
+                    className="gov-btn-secondary text-xs flex items-center gap-1"
+                  >
+                    <Upload className="w-3 h-3" />
+                    Upload Photo
+                  </button>
+                  <button
+                    onClick={() => docInputRef.current?.click()}
+                    className="gov-btn-secondary text-xs flex items-center gap-1"
+                  >
+                    <Upload className="w-3 h-3" />
+                    Upload 7/12 Extract
+                  </button>
                 </div>
               </div>
-            </div>
 
-            {/* Right: Active Field Verification & Evidence Workbench */}
-            <div className="lg:col-span-7 space-y-4">
-              {selectedTask ? (
-                <div className="gov-card p-4 sm:p-5 border-t-4 border-t-[#FF6B00]">
-                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center pb-3 mb-4 border-b border-slate-200 gap-2">
-                    <div>
-                      <span className="text-[10px] font-bold text-orange-700 uppercase bg-orange-100 px-2 py-0.5 rounded">
-                        Active Inspection Workbench
-                      </span>
-                      <h3 className="text-base font-bold text-slate-900 mt-1">
-                        {selectedTask.village} ({selectedTask.id})
-                      </h3>
-                      <p className="text-xs text-slate-600">{selectedTask.project_name}</p>
-                    </div>
+              {mobileUploads.length > 0 ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
+                  {mobileUploads.map((item) => (
+                    <div 
+                      key={item.id} 
+                      className="border border-slate-200 rounded p-3 bg-slate-50 hover:bg-white hover:border-orange-300 transition-all flex flex-col justify-between"
+                    >
+                      <div>
+                        <div className="flex items-center justify-between mb-2">
+                          <span className={`text-[10px] font-bold px-2 py-0.5 rounded flex items-center gap-1 ${
+                            item.upload_type === 'PHOTO'
+                              ? 'bg-blue-100 text-blue-800 border border-blue-200'
+                              : 'bg-indigo-100 text-indigo-800 border border-indigo-200'
+                          }`}>
+                            {item.upload_type === 'PHOTO' ? <ImageIcon className="w-3 h-3" /> : <FileText className="w-3 h-3" />}
+                            {item.upload_type}
+                          </span>
+                          <span className="text-[10px] font-mono text-slate-500 bg-white px-1.5 py-0.5 rounded border border-slate-200">
+                            {item.document_id}
+                          </span>
+                        </div>
 
-                    <div className="text-right text-xs">
-                      <span className="text-slate-500 block text-[10px]">Due Time</span>
-                      <span className="font-bold text-rose-700">{selectedTask.due_date}</span>
-                    </div>
-                  </div>
+                        {item.upload_type === 'PHOTO' ? (
+                          <div className="mb-2 h-32 w-full bg-slate-200 rounded overflow-hidden relative group cursor-pointer" onClick={() => setSelectedImage(item.url)}>
+                            <img 
+                              src={item.url} 
+                              alt={item.file_name}
+                              className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                              onError={(e) => { e.target.src = 'https://placehold.co/400x300?text=Uploaded+Evidence'; }}
+                            />
+                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-xs font-semibold gap-1">
+                              <Eye className="w-4 h-4" /> View Full Image
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="mb-2 h-32 w-full bg-indigo-50 border border-indigo-100 rounded flex flex-col items-center justify-center p-3 text-center">
+                            <FileText className="w-8 h-8 text-indigo-600 mb-1" />
+                            <span className="text-xs font-bold text-slate-800 line-clamp-1">{item.file_name}</span>
+                            <span className="text-[10px] text-slate-500 mt-0.5">{item.file_size ? `${(item.file_size / 1024).toFixed(1)} KB` : 'PDF Extract'}</span>
+                          </div>
+                        )}
 
-                  {/* 1. Quick Action Buttons (Mobile-first large touch targets) */}
-                  <div className="mb-5">
-                    <label className="block text-xs font-bold text-slate-700 uppercase mb-2">
-                      Field Evidence & Geotagging Tools
-                    </label>
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
-                      <button
-                        type="button"
-                        onClick={() => handleQuickAction('Site Photograph Captured')}
-                        className="p-3 bg-slate-50 hover:bg-orange-50 border border-slate-300 hover:border-orange-400 rounded flex flex-col items-center justify-center gap-1.5 transition-colors"
-                      >
-                        <Camera className="w-5 h-5 text-orange-600" />
-                        <span className="font-semibold text-slate-800 text-[11px]">Capture Photo</span>
-                      </button>
+                        <div className="space-y-1 text-xs">
+                          <div className="font-semibold text-slate-800 truncate" title={item.file_name}>
+                            {item.file_name}
+                          </div>
+                          <div className="text-[11px] text-slate-500 flex items-center justify-between">
+                            <span>Uploaded By:</span>
+                            <span className="font-medium text-slate-700">{item.uploaded_by_name}</span>
+                          </div>
+                          <div className="text-[11px] text-slate-500 flex items-center justify-between">
+                            <span>Timestamp:</span>
+                            <span className="font-mono text-slate-600">{item.created_at}</span>
+                          </div>
+                        </div>
+                      </div>
 
-                      <button
-                        type="button"
-                        onClick={handleCaptureGps}
-                        className="p-3 bg-slate-50 hover:bg-orange-50 border border-slate-300 hover:border-orange-400 rounded flex flex-col items-center justify-center gap-1.5 transition-colors"
-                      >
-                        <MapPin className="w-5 h-5 text-green-600" />
-                        <span className="font-semibold text-slate-800 text-[11px]">Record GPS</span>
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => handleQuickAction('7/12 Extract & Title Uploaded')}
-                        className="p-3 bg-slate-50 hover:bg-orange-50 border border-slate-300 hover:border-orange-400 rounded flex flex-col items-center justify-center gap-1.5 transition-colors"
-                      >
-                        <Upload className="w-5 h-5 text-blue-600" />
-                        <span className="font-semibold text-slate-800 text-[11px]">Upload 7/12</span>
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => handleQuickAction('Boundary Stones Flagged')}
-                        className="p-3 bg-slate-50 hover:bg-orange-50 border border-slate-300 hover:border-orange-400 rounded flex flex-col items-center justify-center gap-1.5 transition-colors"
-                      >
-                        <FileCheck className="w-5 h-5 text-purple-600" />
-                        <span className="font-semibold text-slate-800 text-[11px]">Pin Boundary</span>
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Current Captured Coordinates Info Box */}
-                  <div className="bg-slate-100 p-3 rounded border border-slate-200 text-xs mb-4 flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <MapPin className="w-4 h-4 text-orange-600" />
-                      <span className="text-slate-600">Geo-tag:</span>
-                      <span className="font-mono font-bold text-slate-800">{currentGps}</span>
-                    </div>
-                    <span className="text-[10px] bg-green-100 text-green-800 px-1.5 py-0.5 rounded font-semibold">
-                      GPS Locked
-                    </span>
-                  </div>
-
-                  {/* Ground Inspection Checklist & Remarks Form */}
-                  <form onSubmit={handleSubmitVerification} className="space-y-4">
-                    <div>
-                      <label className="block text-xs font-bold text-slate-700 uppercase mb-1">
-                        Statutory Field Checklist
-                      </label>
-                      <div className="space-y-1.5 bg-slate-50 p-3 rounded border border-slate-200 text-xs">
-                        <label className="flex items-center gap-2 cursor-pointer">
-                          <input type="checkbox" defaultChecked className="rounded text-orange-600 focus:ring-orange-500" />
-                          <span>Land parcel boundary physically identified and matched with Cadastral Map</span>
-                        </label>
-                        <label className="flex items-center gap-2 cursor-pointer">
-                          <input type="checkbox" defaultChecked className="rounded text-orange-600 focus:ring-orange-500" />
-                          <span>Structures, wells, borewells, and standing trees enumerated</span>
-                        </label>
-                        <label className="flex items-center gap-2 cursor-pointer">
-                          <input type="checkbox" defaultChecked className="rounded text-orange-600 focus:ring-orange-500" />
-                          <span>Presence of titleholder / occupant confirmed on site</span>
-                        </label>
+                      <div className="mt-3 pt-2.5 border-t border-slate-200 flex items-center justify-between">
+                        <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 flex items-center gap-1">
+                          <Check className="w-2.5 h-2.5" /> PERSISTED
+                        </span>
+                        <a
+                          href={item.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-xs text-orange-600 hover:text-orange-700 font-semibold flex items-center gap-1 hover:underline"
+                        >
+                          <ExternalLink className="w-3 h-3" /> Open File
+                        </a>
                       </div>
                     </div>
-
-                    <div>
-                      <label className="block text-xs font-bold text-slate-700 uppercase mb-1">
-                        Field Inspection Remarks & Findings <span className="text-red-500">*</span>
-                      </label>
-                      <textarea
-                        rows="3"
-                        required
-                        value={remarks}
-                        onChange={(e) => setRemarks(e.target.value)}
-                        placeholder="Enter physical inspection findings, boundary verification status, landowner remarks..."
-                        className="w-full p-2.5 text-xs bg-slate-50 border border-slate-300 rounded focus:bg-white focus:ring-1 focus:ring-orange-500 outline-none"
-                      ></textarea>
-                    </div>
-
-                    <div className="pt-2 flex flex-col sm:flex-row justify-end gap-2.5">
-                      <button
-                        type="submit"
-                        className="gov-btn-primary py-2.5 text-xs font-bold uppercase w-full sm:w-auto"
-                      >
-                        <Send className="w-4 h-4" />
-                        <span>Submit Verification to CALA Office</span>
-                      </button>
-                    </div>
-                  </form>
+                  ))}
                 </div>
               ) : (
-                <div className="gov-card p-12 text-center text-slate-500 text-xs">
-                  Please select a task from the list to begin field inspection.
+                <div className="py-12 text-center bg-slate-50 border border-dashed border-slate-200 rounded">
+                  <Smartphone className="w-8 h-8 text-slate-400 mx-auto mb-2" />
+                  <h4 className="text-xs font-bold text-slate-700">No Mobile Uploads Recorded Yet</h4>
+                  <p className="text-[11px] text-slate-500 mt-1 max-w-sm mx-auto">
+                    Evidence captured from the physical mobile app or uploaded via this terminal will appear here in real time.
+                  </p>
                 </div>
               )}
             </div>
+          )}
 
-          </div>
+          {/* TAB 2: ASSIGNED TASKS */}
+          {activeTab === 'tasks' && (
+            <div className="gov-card p-4">
+              <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wide mb-3 flex items-center gap-2">
+                <FileCheck className="w-4 h-4 text-orange-600" />
+                Assigned Operational Field Tasks
+              </h3>
+              {tasks.length > 0 ? (
+                <div className="overflow-x-auto">
+                  <table className="gov-table">
+                    <thead>
+                      <tr>
+                        <th>Task ID</th>
+                        <th>Task Type</th>
+                        <th>Project / Corridor</th>
+                        <th>Village & Parcel</th>
+                        <th>Priority</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {tasks.map((t) => (
+                        <tr key={t.id || t.task_id}>
+                          <td className="font-mono font-bold text-orange-600">{t.id}</td>
+                          <td className="font-medium text-slate-800">{t.task_type}</td>
+                          <td className="text-slate-600">{t.project_name}</td>
+                          <td className="text-slate-700">{t.village}</td>
+                          <td>
+                            <span className={`text-[10px] font-bold px-2 py-0.5 rounded ${
+                              t.priority === 'HIGH' ? 'bg-red-100 text-red-800' : 'bg-blue-100 text-blue-800'
+                            }`}>
+                              {t.priority || 'NORMAL'}
+                            </span>
+                          </td>
+                          <td>
+                            <span className={`text-[10px] font-bold px-2 py-0.5 rounded ${
+                              t.status === 'SUBMITTED' 
+                                ? 'bg-emerald-100 text-emerald-800' 
+                                : 'bg-amber-100 text-amber-800'
+                            }`}>
+                              {t.status}
+                            </span>
+                          </td>
+                          <td>
+                            <button
+                              onClick={() => {
+                                setSelectedTask(t);
+                                setActiveTab('uploads');
+                              }}
+                              className="text-xs text-orange-600 hover:text-orange-800 font-semibold underline"
+                            >
+                              Attach Evidence
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <div className="py-8 text-center text-xs text-slate-500">
+                  No assigned tasks in database.
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* TAB 3: FIELD VISITS & GPS LOGS */}
+          {activeTab === 'visits' && (
+            <div className="gov-card p-4">
+              <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wide mb-3 flex items-center gap-2">
+                <Navigation className="w-4 h-4 text-orange-600" />
+                Field Visit Sessions & GNSS Calibration
+              </h3>
+              {fieldVisits.length > 0 ? (
+                <div className="overflow-x-auto">
+                  <table className="gov-table">
+                    <thead>
+                      <tr>
+                        <th>Visit ID</th>
+                        <th>Task #</th>
+                        <th>Task Description</th>
+                        <th>GNSS Coordinates</th>
+                        <th>Start Timestamp</th>
+                        <th>Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {fieldVisits.map((v) => (
+                        <tr key={v.id || v.visit_id}>
+                          <td className="font-mono font-bold text-slate-900">#{v.visit_id || v.id}</td>
+                          <td className="font-mono text-orange-600">#{v.task_id}</td>
+                          <td className="text-slate-800 font-medium">{v.task_type}</td>
+                          <td className="font-mono text-xs text-slate-700">
+                            {v.gps_display}
+                          </td>
+                          <td className="text-xs text-slate-600">{v.visit_start}</td>
+                          <td>
+                            <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-100 text-emerald-800">
+                              {v.status}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <div className="py-8 text-center text-xs text-slate-500">
+                  No field visits initiated yet.
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* TAB 4: SUBMITTED VERIFICATIONS */}
+          {activeTab === 'verifications' && (
+            <div className="gov-card p-4">
+              <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wide mb-3 flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 text-orange-600" />
+                Submitted Field Verifications (Forwarded to CALA)
+              </h3>
+              {fieldVerifications.length > 0 ? (
+                <div className="space-y-3">
+                  {fieldVerifications.map((vf) => (
+                    <div key={vf.id || vf.verification_id} className="p-3.5 border border-slate-200 rounded bg-slate-50">
+                      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-2">
+                        <div className="flex items-center gap-2">
+                          <span className="bg-emerald-600 text-white text-xs font-bold px-2 py-0.5 rounded">
+                            Verification #{vf.verification_id || vf.id}
+                          </span>
+                          <span className="font-mono text-xs font-semibold text-slate-800">
+                            Task #{vf.task_id} • Visit #{vf.visit_id}
+                          </span>
+                        </div>
+                        <span className="text-xs text-slate-500 font-mono">
+                          Submitted: {vf.verified_at}
+                        </span>
+                      </div>
+                      <p className="text-xs text-slate-700 bg-white p-2.5 rounded border border-slate-200 mt-2">
+                        <span className="font-semibold text-slate-900">Survey Remarks:</span> {vf.remarks || 'Ground survey verified with boundary demarcation.'}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="py-8 text-center text-xs text-slate-500">
+                  No submitted field verifications recorded yet.
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* TAB 5: LIVE AUDIT TRAIL */}
+          {activeTab === 'audit' && (
+            <div className="gov-card p-4">
+              <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wide mb-3 flex items-center gap-2">
+                <Clock className="w-4 h-4 text-orange-600" />
+                Live PostgreSQL Audit Log Activity Feed
+              </h3>
+              {recentActivities.length > 0 ? (
+                <div className="space-y-2">
+                  {recentActivities.map((act) => (
+                    <div key={act.id} className="p-2.5 border border-slate-200 rounded bg-slate-50 flex items-center justify-between text-xs">
+                      <div className="flex items-center gap-2">
+                        <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0"></span>
+                        <span className="font-bold text-slate-800">{act.action}</span>
+                        <span className="text-slate-600 hidden sm:inline">{act.message}</span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <span className="text-[11px] text-slate-500">{act.user}</span>
+                        <span className="font-mono text-[11px] text-slate-400">{act.timestamp}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="py-8 text-center text-xs text-slate-500">
+                  No audit activity recorded.
+                </div>
+              )}
+            </div>
+          )}
         </>
+      )}
+
+      {/* Image Modal Preview */}
+      {selectedImage && (
+        <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4" onClick={() => setSelectedImage(null)}>
+          <div className="bg-white rounded max-w-2xl w-full p-3 relative" onClick={(e) => e.stopPropagation()}>
+            <button 
+              onClick={() => setSelectedImage(null)}
+              className="absolute top-2 right-2 p-1 bg-slate-200 hover:bg-slate-300 rounded text-slate-700"
+            >
+              <X className="w-4 h-4" />
+            </button>
+            <h4 className="text-xs font-bold text-slate-800 mb-2">Ground Evidence Photo Preview</h4>
+            <div className="max-h-[70vh] overflow-hidden rounded bg-slate-900 flex items-center justify-center">
+              <img src={selectedImage} alt="Preview" className="max-h-[70vh] object-contain" />
+            </div>
+            <div className="mt-2 text-right">
+              <a 
+                href={selectedImage} 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="gov-btn-secondary text-xs inline-flex items-center gap-1"
+              >
+                <Download className="w-3.5 h-3.5" /> Download Full Resolution
+              </a>
+            </div>
+          </div>
+        </div>
       )}
     </DashboardLayout>
   );

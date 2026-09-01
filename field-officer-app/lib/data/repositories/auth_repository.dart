@@ -21,13 +21,14 @@ class MockAuthRepository implements IAuthRepository {
 
   @override
   Future<UserModel> login({required String email, required String password}) async {
-    // Simulate brief network latency
     await Future.delayed(const Duration(milliseconds: 600));
 
-    // Validate demo or standard credentials
-    if (email.trim().toLowerCase() == MockDataSource.defaultOfficer.email.toLowerCase() &&
-        (password == 'demo@123' || password == 'password')) {
-      final user = MockDataSource.defaultOfficer;
+    final cleanEmail = email.trim().toLowerCase();
+    if ((cleanEmail == MockDataSource.defaultOfficer.email.toLowerCase() ||
+            cleanEmail == 'field.demo@example.com' ||
+            cleanEmail == 'field.demo@bhoomisetu.gov.in') &&
+        (password == 'demo@123' || password == 'Demo@12345' || password == 'password')) {
+      final user = MockDataSource.defaultOfficer.copyWith(email: email.trim());
       await _secureStorage.saveAuthTokens(
         accessToken: user.token ?? 'mock_token',
         userId: user.id,
@@ -35,7 +36,7 @@ class MockAuthRepository implements IAuthRepository {
       await _secureStorage.saveUserJson(jsonEncode(user.toJson()));
       return user;
     } else {
-      throw ValidationException(message: 'Invalid credentials. Use field.demo@bhoomisetu.gov.in / demo@123');
+      throw ValidationException(message: 'Invalid credentials. Use field.demo@example.com / Demo@12345');
     }
   }
 
@@ -75,16 +76,19 @@ class ApiAuthRepository implements IAuthRepository {
   Future<UserModel> login({required String email, required String password}) async {
     final response = await _apiClient.post(
       ApiEndpoints.login,
-      data: {'email': email, 'password': password},
+      data: {'email': email.trim(), 'password': password},
     );
 
-    final data = response.data as Map<String, dynamic>;
-    final user = UserModel.fromJson(data['user'] as Map<String, dynamic>? ?? data);
-    final accessToken = data['access_token'] as String? ?? user.token ?? '';
+    final rootMap = response.data as Map<String, dynamic>;
+    final dataMap = rootMap['data'] as Map<String, dynamic>? ?? rootMap;
+    final userMap = dataMap['user'] as Map<String, dynamic>? ?? dataMap;
+    final accessToken = (dataMap['access_token'] ?? dataMap['token']) as String? ?? '';
+
+    final user = UserModel.fromJson(userMap).copyWith(token: accessToken);
 
     await _secureStorage.saveAuthTokens(
       accessToken: accessToken,
-      refreshToken: data['refresh_token'] as String?,
+      refreshToken: dataMap['refresh_token'] as String?,
       userId: user.id,
     );
     await _secureStorage.saveUserJson(jsonEncode(user.toJson()));
@@ -96,9 +100,21 @@ class ApiAuthRepository implements IAuthRepository {
   Future<UserModel?> getCurrentUser() async {
     final userJson = await _secureStorage.getUserJson();
     if (userJson != null) {
-      return UserModel.fromJson(jsonDecode(userJson) as Map<String, dynamic>);
+      try {
+        return UserModel.fromJson(jsonDecode(userJson) as Map<String, dynamic>);
+      } catch (_) {}
     }
-    return null;
+
+    try {
+      final response = await _apiClient.get(ApiEndpoints.me);
+      final rootMap = response.data as Map<String, dynamic>;
+      final dataMap = rootMap['data'] as Map<String, dynamic>? ?? rootMap;
+      final user = UserModel.fromJson(dataMap);
+      await _secureStorage.saveUserJson(jsonEncode(user.toJson()));
+      return user;
+    } catch (_) {
+      return null;
+    }
   }
 
   @override

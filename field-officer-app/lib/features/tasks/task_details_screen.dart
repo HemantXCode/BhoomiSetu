@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../data/models/field_task_model.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_text_styles.dart';
+import '../../core/utils/date_formatter.dart';
 import '../../core/widgets/bhoomi_app_bar.dart';
 import '../../core/widgets/bhoomi_button.dart';
 import '../../core/widgets/status_badge.dart';
@@ -84,11 +85,11 @@ class TaskDetailsScreen extends StatelessWidget {
                     Row(
                       children: [
                         Expanded(
-                          child: _buildDateBox('Assigned Date', task.assignedDate, Icons.calendar_today),
+                          child: _buildDateBox('Assigned Date', DateFormatter.formatDateString(task.assignedDate), Icons.calendar_today),
                         ),
                         const SizedBox(width: 12),
                         Expanded(
-                          child: _buildDateBox('Due Date', task.dueDate, Icons.event_available, isDue: true),
+                          child: _buildDateBox('Due Date', DateFormatter.formatDateString(task.dueDate), Icons.event_available, isDue: true),
                         ),
                       ],
                     ),

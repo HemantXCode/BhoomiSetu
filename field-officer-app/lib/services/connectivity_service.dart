@@ -1,5 +1,7 @@
 import 'dart:async';
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:dio/dio.dart';
+import '../core/network/api_config.dart';
 
 enum ConnectionStatus {
   online,
@@ -8,39 +10,57 @@ enum ConnectionStatus {
 
 class ConnectivityService {
   final Connectivity _connectivity;
+  final Dio _healthDio;
   final StreamController<ConnectionStatus> _statusController =
       StreamController<ConnectionStatus>.broadcast();
   ConnectionStatus _currentStatus = ConnectionStatus.online;
 
-  ConnectivityService({Connectivity? connectivity})
-      : _connectivity = connectivity ?? Connectivity() {
+  ConnectivityService({Connectivity? connectivity, Dio? dio})
+      : _connectivity = connectivity ?? Connectivity(),
+        _healthDio = dio ??
+            Dio(
+              BaseOptions(
+                connectTimeout: const Duration(seconds: 4),
+                receiveTimeout: const Duration(seconds: 4),
+              ),
+            ) {
     _init();
   }
 
   void _init() {
-    _connectivity.onConnectivityChanged.listen((results) {
-      _updateStatus(results);
+    _connectivity.onConnectivityChanged.listen((_) {
+      checkConnectivity();
     });
     checkConnectivity();
   }
 
-  void _updateStatus(List<ConnectivityResult> results) {
-    final isConnected = results.any((r) =>
-        r == ConnectivityResult.mobile ||
-        r == ConnectivityResult.wifi ||
-        r == ConnectivityResult.ethernet);
-
-    final newStatus = isConnected ? ConnectionStatus.online : ConnectionStatus.offline;
-    if (newStatus != _currentStatus) {
-      _currentStatus = newStatus;
-      _statusController.add(_currentStatus);
+  Future<ConnectionStatus> checkConnectivity() async {
+    // If running in Mock mode, always treat as online
+    if (ApiConfig.isMockMode) {
+      _setStatus(ConnectionStatus.online);
+      return ConnectionStatus.online;
     }
+
+    try {
+      final healthUrl = '${ApiConfig.baseUrl}/health';
+      final response = await _healthDio.get(healthUrl);
+      if (response.statusCode == 200) {
+        _setStatus(ConnectionStatus.online);
+        return ConnectionStatus.online;
+      }
+    } catch (_) {
+      // Backend ping failed
+    }
+
+    _setStatus(ConnectionStatus.offline);
+    return ConnectionStatus.offline;
   }
 
-  Future<ConnectionStatus> checkConnectivity() async {
-    final results = await _connectivity.checkConnectivity();
-    _updateStatus(results);
-    return _currentStatus;
+  void _setStatus(ConnectionStatus status) {
+    if (status != _currentStatus) {
+      _currentStatus = status;
+      _statusController.add(_currentStatus);
+    }
   }
 
   bool get isOnline => _currentStatus == ConnectionStatus.online;

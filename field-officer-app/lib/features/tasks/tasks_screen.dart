@@ -5,6 +5,7 @@ import '../../core/widgets/bhoomi_app_bar.dart';
 import '../../core/widgets/status_badge.dart';
 import '../../core/widgets/loading_view.dart';
 import '../../core/routing/app_router.dart';
+import '../../core/utils/date_formatter.dart';
 import 'tasks_controller.dart';
 
 class TasksScreen extends ConsumerWidget {
@@ -161,7 +162,7 @@ class TasksScreen extends ConsumerWidget {
                                               const Icon(Icons.event, size: 14, color: AppColors.textMuted),
                                               const SizedBox(width: 4),
                                               Text(
-                                                'Due: ${task.dueDate}',
+                                                'Due: ${DateFormatter.formatDateString(task.dueDate)}',
                                                 style: const TextStyle(
                                                   fontSize: 12,
                                                   fontWeight: FontWeight.w600,

@@ -176,7 +176,7 @@ class DashboardScreen extends ConsumerWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Hello, ${officer?.name ?? AppConstants.demoOfficerName}',
+                        'Hello, ${officer?.name ?? "Field Officer"}',
                         style: const TextStyle(
                           fontSize: 17,
                           fontWeight: FontWeight.w700,
@@ -185,7 +185,7 @@ class DashboardScreen extends ConsumerWidget {
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        '${officer?.designation ?? AppConstants.demoDesignation} • ${officer?.officerId ?? AppConstants.demoOfficerId}',
+                        '${officer?.designation ?? "Revenue & Land Officer"}${officer?.officerId != null ? " • ${officer!.officerId}" : ""}',
                         style: const TextStyle(
                           fontSize: 12,
                           color: Color(0xFFCBD5E1),
@@ -205,7 +205,9 @@ class DashboardScreen extends ConsumerWidget {
                     const Icon(Icons.location_on, size: 16, color: AppColors.primaryLight),
                     const SizedBox(width: 4),
                     Text(
-                      '${officer?.district ?? AppConstants.demoDistrict}, ${officer?.state ?? AppConstants.demoState}',
+                      officer?.district != null && officer?.state != null
+                          ? '${officer!.district}, ${officer!.state}'
+                          : (officer?.district ?? officer?.state ?? 'Government Jurisdiction'),
                       style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Colors.white),
                     ),
                   ],

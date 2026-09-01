@@ -27,7 +27,7 @@ class LandParcelModel {
 
   factory LandParcelModel.fromJson(Map<String, dynamic> json) {
     return LandParcelModel(
-      parcelId: json['parcelId'] as String? ?? json['parcel_id'] as String? ?? '',
+      parcelId: (json['parcelId'] ?? json['parcel_id'] ?? json['id'])?.toString() ?? '',
       surveyNumber: json['surveyNumber'] as String? ?? json['survey_number'] as String? ?? '',
       village: json['village'] as String? ?? '',
       district: json['district'] as String? ?? 'Pune',

@@ -6,6 +6,7 @@ import '../../core/theme/app_text_styles.dart';
 import '../../core/widgets/bhoomi_app_bar.dart';
 import '../../core/widgets/bhoomi_button.dart';
 import '../../core/network/api_config.dart';
+import '../../core/providers/app_providers.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
@@ -15,8 +16,15 @@ class SettingsScreen extends ConsumerStatefulWidget {
 }
 
 class _SettingsScreenState extends ConsumerState<SettingsScreen> {
-  final _urlController = TextEditingController(text: ApiConfig.baseUrl);
-  DataMode _currentMode = ApiConfig.dataMode;
+  late final TextEditingController _urlController;
+  late DataMode _currentMode;
+
+  @override
+  void initState() {
+    super.initState();
+    _urlController = TextEditingController(text: ApiConfig.baseUrl);
+    _currentMode = ApiConfig.dataMode;
+  }
 
   @override
   void dispose() {
@@ -24,13 +32,19 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     super.dispose();
   }
 
-  void _saveSettings() {
-    ApiConfig.setBaseUrl(_urlController.text.trim());
-    ApiConfig.setDataMode(_currentMode);
+  Future<void> _saveSettings() async {
+    final newUrl = _urlController.text.trim();
+    await ApiConfig.saveSettings(newUrl, _currentMode);
+    ref.read(dataModeProvider.notifier).state = _currentMode;
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Configuration saved successfully.')),
-    );
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Configuration saved: $_currentMode mode using $newUrl'),
+          backgroundColor: AppColors.success,
+        ),
+      );
+    }
   }
 
   @override
@@ -103,7 +117,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       controller: _urlController,
                       decoration: const InputDecoration(
                         prefixIcon: Icon(Icons.link, size: 20),
-                        hintText: 'https://api.bhoomisetu.gov.in',
+                        hintText: 'http://192.168.29.94:5000',
                       ),
                     ),
                   ],

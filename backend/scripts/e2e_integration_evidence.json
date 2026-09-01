@@ -1,0 +1,236 @@
+{
+  "counts_before": {
+    "users": 5,
+    "tasks": 3,
+    "visits": 5,
+    "verifications": 9,
+    "sync_events": 4,
+    "documents": 0
+  },
+  "health": {
+    "status": 200,
+    "data": {
+      "status": "healthy",
+      "system": "BhoomiSetu - National Land Acquisition & Management System",
+      "version": "1.0.0"
+    }
+  },
+  "auth_login": {
+    "status": 200,
+    "role": "FIELD_OFFICER",
+    "user_id": 5
+  },
+  "auth_me": {
+    "status": 200,
+    "email": "field.demo@example.com"
+  },
+  "tasks_list": {
+    "status": 200,
+    "count": 3,
+    "first_task_id": 101
+  },
+  "task_detail": {
+    "status": 200,
+    "project_name": "Pune Ring Road Express Corridor (Phase-I)",
+    "parcel": {
+      "id": 1,
+      "parcel_number": "PARCEL-MH-PUN-001",
+      "survey_number": "Gat No. 142/3A",
+      "village": "Haveli",
+      "area_hectares": 12.5,
+      "owner_name": "Ramesh Chandra Patil",
+      "classification": "AGRICULTURAL",
+      "boundary_coordinates": [
+        [
+          73.8567,
+          18.5204
+        ],
+        [
+          73.8575,
+          18.521
+        ],
+        [
+          73.858,
+          18.52
+        ],
+        [
+          73.8567,
+          18.5204
+        ]
+      ]
+    },
+    "checklist_schema": [
+      {
+        "id": "boundary_verified",
+        "label": "Boundary Markers Verified",
+        "type": "BOOLEAN"
+      },
+      {
+        "id": "structure_count",
+        "label": "Number of Structures Identified",
+        "type": "NUMBER"
+      },
+      {
+        "id": "tree_count",
+        "label": "Number of Trees Enumerated",
+        "type": "NUMBER"
+      },
+      {
+        "id": "dispute_flag",
+        "label": "Local Dispute / Objection Raised",
+        "type": "BOOLEAN"
+      }
+    ]
+  },
+  "create_visit": {
+    "status": 201,
+    "visit_id": 6
+  },
+  "photo_upload": {
+    "status": 201,
+    "file_url": null
+  },
+  "verification": {
+    "status": 201,
+    "verification_id": 10,
+    "event_id": "EVT_a57807cc-0ec9-4b98-b1c2-bd01ce5b4f25"
+  },
+  "sync_attempt_1": {
+    "status": 200,
+    "processed": 1,
+    "duplicate": 0
+  },
+  "sync_attempt_2_idempotency": {
+    "status": 200,
+    "processed": 0,
+    "duplicate": 1
+  },
+  "document_upload": {
+    "status": 201,
+    "document_id": null,
+    "file_url": null
+  },
+  "geo_states": {
+    "status": 200,
+    "count": 6
+  },
+  "geo_districts": {
+    "status": 200,
+    "count": 4
+  },
+  "geo_projects": {
+    "status": 200,
+    "count": 2
+  },
+  "geo_parcels": {
+    "status": 200,
+    "type": null
+  },
+  "dashboard_stats": {
+    "status": 200,
+    "stats": {
+      "role": "FIELD_OFFICER",
+      "district_name": "Pune",
+      "summary": {
+        "assigned_projects": 2,
+        "pending_verification": 6,
+        "completed_verification": 18,
+        "assigned_parcels": 24,
+        "todays_tasks": 3,
+        "verification_accuracy": "98.5%"
+      },
+      "assigned_projects_list": [
+        {
+          "id": 1,
+          "project_name": "Pune Ring Road Express Corridor (Phase-I)",
+          "description": "Acquisition of bypass land corridor spanning Haveli and Mulshi talukas.",
+          "agency_id": 1,
+          "agency_name": "National Highways Authority of India (NHAI)",
+          "state_id": 1,
+          "state_name": "Maharashtra",
+          "district_id": 1,
+          "district_name": "Pune",
+          "proposed_area": 485.5,
+          "status": "COMPENSATION_IN_PROGRESS",
+          "start_date": "2025-01-15",
+          "expected_end_date": "2026-12-31",
+          "created_at": "2026-08-29T05:52:47.403250"
+        },
+        {
+          "id": 2,
+          "project_name": "Pune-Nashik Semi High-Speed Rail Corridor",
+          "description": "Linear greenfield land acquisition across 12 villages.",
+          "agency_id": 3,
+          "agency_name": "Maharashtra State Road Development Corporation (MSRDC)",
+          "state_id": 1,
+          "state_name": "Maharashtra",
+          "district_id": 1,
+          "district_name": "Pune",
+          "proposed_area": 310.2,
+          "status": "NOTIFICATION_IN_PROGRESS",
+          "start_date": "2025-03-01",
+          "expected_end_date": "2027-06-30",
+          "created_at": "2026-08-29T05:52:47.403250"
+        }
+      ],
+      "field_tasks": [
+        {
+          "id": "TSK-101",
+          "project_name": "Pune Ring Road Express Corridor",
+          "village": "Haveli (Gat No. 142/3A)",
+          "task_type": "Ground Boundary Delineation",
+          "status": "PENDING",
+          "gps_coords": "18.5204\u00b0 N, 73.8567\u00b0 E",
+          "due_date": "Today, 05:00 PM",
+          "priority": "HIGH"
+        },
+        {
+          "id": "TSK-102",
+          "project_name": "Pune Ring Road Express Corridor",
+          "village": "Mulshi (Gat No. 89/1B)",
+          "task_type": "Structure & Tree Enumeration",
+          "status": "IN_PROGRESS",
+          "gps_coords": "18.5089\u00b0 N, 73.5122\u00b0 E",
+          "due_date": "Tomorrow",
+          "priority": "MEDIUM"
+        },
+        {
+          "id": "TSK-103",
+          "project_name": "Pune-Nashik Rail Corridor",
+          "village": "Bhosari (Survey No. 45/2)",
+          "task_type": "Land Title Document Verification",
+          "status": "PENDING",
+          "gps_coords": "18.6279\u00b0 N, 73.8475\u00b0 E",
+          "due_date": "28 Aug 2026",
+          "priority": "NORMAL"
+        }
+      ],
+      "recent_activities": [
+        {
+          "id": 1,
+          "action": "GPS boundary pinned for Gat No. 140/2",
+          "time": "10:30 AM Today"
+        },
+        {
+          "id": 2,
+          "action": "Site photograph and inspection remark uploaded for Parcel #92",
+          "time": "Yesterday"
+        }
+      ]
+    }
+  },
+  "counts_after": {
+    "users": 5,
+    "tasks": 3,
+    "visits": 6,
+    "verifications": 11,
+    "sync_events": 5,
+    "documents": 0
+  },
+  "database_persistence": {
+    "visits_delta": 1,
+    "verifications_delta": 2,
+    "sync_events_delta": 1,
+    "documents_delta": 0
+  }
+}

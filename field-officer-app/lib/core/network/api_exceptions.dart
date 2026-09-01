@@ -29,11 +29,19 @@ class ValidationException extends ApiException {
 }
 
 class ServerException extends ApiException {
-  ServerException({String message = 'Server error occurred. Please try again later.'})
+  ServerException({String message = 'Internal Server Error. Please try again later.'})
       : super(message: message, statusCode: 500);
 }
 
+class BackendUnavailableException extends ApiException {
+  BackendUnavailableException({String? message})
+      : super(
+          message: message ?? 'Backend server unavailable. Please verify connection to the server.',
+          statusCode: 503,
+        );
+}
+
 class NetworkException extends ApiException {
-  NetworkException({String message = 'No internet connection. Changes saved offline.'})
+  NetworkException({String message = 'Cannot connect to backend server. Please verify network or server URL.'})
       : super(message: message, statusCode: null);
 }

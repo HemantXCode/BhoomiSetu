@@ -11,6 +11,13 @@ class DateFormatter {
     return _dateFormat.format(date);
   }
 
+  static String formatDateString(String? dateStr) {
+    if (dateStr == null || dateStr.isEmpty) return '--';
+    final parsed = DateTime.tryParse(dateStr);
+    if (parsed == null) return dateStr;
+    return _dateFormat.format(parsed);
+  }
+
   static String formatTime(DateTime? time) {
     if (time == null) return '--';
     return _timeFormat.format(time);

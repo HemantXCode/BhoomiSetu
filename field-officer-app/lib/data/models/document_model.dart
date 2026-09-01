@@ -21,17 +21,20 @@ class DocumentModel {
     this.syncStatus = 'PENDING',
   });
 
+  String get filePath => localFilePath;
+  String get title => fileName;
+
   factory DocumentModel.fromJson(Map<String, dynamic> json) {
     return DocumentModel(
-      documentId: json['documentId'] as String? ?? json['document_id'] as String? ?? '',
-      visitId: json['visitId'] as String? ?? json['visit_id'] as String? ?? '',
-      parcelId: json['parcelId'] as String? ?? json['parcel_id'] as String? ?? '',
-      fileName: json['fileName'] as String? ?? json['file_name'] as String? ?? '',
-      fileType: json['fileType'] as String? ?? json['file_type'] as String? ?? 'PDF',
-      fileSizeBytes: json['fileSizeBytes'] as int? ?? json['file_size_bytes'] as int? ?? 0,
-      localFilePath: json['localFilePath'] as String? ?? json['local_file_path'] as String? ?? '',
-      uploadStatus: json['uploadStatus'] as String? ?? json['upload_status'] as String? ?? 'PENDING_UPLOAD',
-      syncStatus: json['syncStatus'] as String? ?? json['sync_status'] as String? ?? 'PENDING',
+      documentId: (json['documentId'] ?? json['document_id'] ?? json['id'])?.toString() ?? '',
+      visitId: (json['visitId'] ?? json['visit_id'])?.toString() ?? '',
+      parcelId: (json['parcelId'] ?? json['parcel_id'])?.toString() ?? '',
+      fileName: (json['fileName'] ?? json['file_name'] ?? json['title']) as String? ?? '',
+      fileType: (json['fileType'] ?? json['file_type']) as String? ?? 'PDF',
+      fileSizeBytes: (json['fileSizeBytes'] as num?)?.toInt() ?? (json['file_size_bytes'] as num?)?.toInt() ?? 0,
+      localFilePath: (json['localFilePath'] ?? json['local_file_path'] ?? json['file_path'] ?? json['filePath'])?.toString() ?? '',
+      uploadStatus: (json['uploadStatus'] ?? json['upload_status']) as String? ?? 'PENDING_UPLOAD',
+      syncStatus: (json['syncStatus'] ?? json['sync_status']) as String? ?? 'PENDING',
     );
   }
 

@@ -14,7 +14,7 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     async function verifySession() {
       const savedToken = localStorage.getItem('bhoomisetu_token');
-      if (savedToken) {
+      if (savedToken && savedToken !== 'undefined' && savedToken !== 'null') {
         try {
           const res = await authService.getMe();
           if (res.success && res.data) {
@@ -25,6 +25,10 @@ export const AuthProvider = ({ children }) => {
           console.warn('Session verification failed:', err.message);
           logout();
         }
+      } else {
+        // Purge corrupted token strings if present
+        localStorage.removeItem('bhoomisetu_token');
+        localStorage.removeItem('bhoomisetu_user');
       }
       setLoading(false);
     }
@@ -35,7 +39,8 @@ export const AuthProvider = ({ children }) => {
   const login = async (email, password) => {
     const response = await authService.login(email, password);
     if (response.success && response.data) {
-      const { token: jwtToken, user: userData } = response.data;
+      const jwtToken = response.data.access_token || response.data.token;
+      const userData = response.data.user;
       setToken(jwtToken);
       setUser(userData);
       localStorage.setItem('bhoomisetu_token', jwtToken);

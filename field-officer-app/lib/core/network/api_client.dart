@@ -1,5 +1,4 @@
 import 'package:dio/dio.dart';
-import '../constants/api_endpoints.dart';
 import 'api_config.dart';
 import 'api_exceptions.dart';
 import '../storage/secure_storage_service.dart';
@@ -28,6 +27,9 @@ class ApiClient {
     _dio.interceptors.add(
       InterceptorsWrapper(
         onRequest: (options, handler) async {
+          // Sync Base URL with current ApiConfig
+          options.baseUrl = ApiConfig.baseUrl;
+
           // Attach Authorization Bearer token if present
           final token = await _secureStorage.getAccessToken();
           if (token != null && token.isNotEmpty) {
@@ -55,7 +57,9 @@ class ApiClient {
         error.type == DioExceptionType.sendTimeout ||
         error.type == DioExceptionType.receiveTimeout ||
         error.type == DioExceptionType.connectionError) {
-      return NetworkException();
+      return NetworkException(
+        message: 'Cannot connect to backend server at ${ApiConfig.baseUrl}. Please verify Wi-Fi or USB connection.',
+      );
     }
 
     final statusCode = error.response?.statusCode;

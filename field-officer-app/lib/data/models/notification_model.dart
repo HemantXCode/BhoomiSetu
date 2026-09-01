@@ -18,16 +18,26 @@ class NotificationModel {
   });
 
   factory NotificationModel.fromJson(Map<String, dynamic> json) {
+    final rawId = (json['id'] ?? json['notification_id'])?.toString() ?? '';
+    final title = json['title'] as String? ?? json['notification_type'] as String? ?? 'Gazette Notification';
+    final gazetteNum = json['gazette_number'] as String?;
+    final message = json['message'] as String? ?? (gazetteNum != null ? 'Gazette Publication: $gazetteNum' : 'Official statutory land notification');
+
+    DateTime ts = DateTime.now();
+    if (json['timestamp'] != null) {
+      ts = DateTime.tryParse(json['timestamp'].toString()) ?? DateTime.now();
+    } else if (json['issue_date'] != null) {
+      ts = DateTime.tryParse(json['issue_date'].toString()) ?? DateTime.now();
+    }
+
     return NotificationModel(
-      id: json['id'] as String? ?? '',
-      title: json['title'] as String? ?? '',
-      message: json['message'] as String? ?? '',
-      type: json['type'] as String? ?? 'GENERAL',
-      timestamp: json['timestamp'] != null
-          ? DateTime.tryParse(json['timestamp'] as String) ?? DateTime.now()
-          : DateTime.now(),
+      id: rawId,
+      title: title,
+      message: message,
+      type: json['type'] as String? ?? json['notification_type'] as String? ?? 'GENERAL',
+      timestamp: ts,
       isRead: json['isRead'] == 1 || json['isRead'] == true || json['is_read'] == 1,
-      relatedId: json['relatedId'] as String? ?? json['related_id'] as String?,
+      relatedId: (json['relatedId'] ?? json['related_id'] ?? json['project_id'])?.toString(),
     );
   }
 

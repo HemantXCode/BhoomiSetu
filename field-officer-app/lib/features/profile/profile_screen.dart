@@ -44,7 +44,7 @@ class ProfileScreen extends ConsumerWidget {
                     ),
                     const SizedBox(height: 12),
                     Text(
-                      user?.name ?? AppConstants.demoOfficerName,
+                      user?.name ?? 'Field Officer',
                       style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w800,
@@ -53,7 +53,7 @@ class ProfileScreen extends ConsumerWidget {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      user?.designation ?? AppConstants.demoDesignation,
+                      user?.designation ?? 'Sub-Divisional Revenue Officer',
                       style: const TextStyle(fontSize: 13, color: AppColors.textMuted),
                     ),
                     const SizedBox(height: 8),
@@ -64,7 +64,7 @@ class ProfileScreen extends ConsumerWidget {
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Text(
-                        'ID: ${user?.officerId ?? AppConstants.demoOfficerId}',
+                        'OFFICER ID: ${user?.officerId ?? "#${user?.id ?? "OFFICIAL"}"}',
                         style: const TextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.w700,
@@ -74,10 +74,10 @@ class ProfileScreen extends ConsumerWidget {
                       ),
                     ),
                     const Divider(height: 28),
-                    _buildProfileRow(Icons.location_on_outlined, 'Jurisdiction', '${user?.district ?? "Pune"}, ${user?.state ?? "Maharashtra"}'),
-                    _buildProfileRow(Icons.email_outlined, 'Official Email', user?.email ?? AppConstants.demoEmail),
-                    _buildProfileRow(Icons.phone_outlined, 'Contact Phone', user?.phone ?? '+91 98230 45678'),
-                    _buildProfileRow(Icons.verified_user_outlined, 'Authority Level', 'Field Verification Officer Grade-I'),
+                    _buildProfileRow(Icons.location_on_outlined, 'Jurisdiction', '${user?.district ?? "District Authority"}, ${user?.state ?? "State Revenue"}'),
+                    _buildProfileRow(Icons.email_outlined, 'Official Email', user?.email ?? 'officer@bhoomisetu.gov.in'),
+                    _buildProfileRow(Icons.phone_outlined, 'Contact Phone', user?.phone ?? '+91 ••••• •••••'),
+                    _buildProfileRow(Icons.verified_user_outlined, 'Authority Level', 'Field Verification Unit'),
                   ],
                 ),
               ),

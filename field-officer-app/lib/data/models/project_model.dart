@@ -17,11 +17,11 @@ class ProjectModel {
 
   factory ProjectModel.fromJson(Map<String, dynamic> json) {
     return ProjectModel(
-      id: json['id'] as String? ?? '',
-      name: json['name'] as String? ?? '',
-      code: json['code'] as String? ?? '',
-      state: json['state'] as String? ?? '',
-      district: json['district'] as String? ?? '',
+      id: (json['id'] ?? json['project_id'])?.toString() ?? '',
+      name: json['name'] as String? ?? json['project_name'] as String? ?? '',
+      code: json['code'] as String? ?? json['project_code'] as String? ?? '',
+      state: json['state'] as String? ?? json['state_name'] as String? ?? '',
+      district: json['district'] as String? ?? json['district_name'] as String? ?? '',
       status: json['status'] as String? ?? 'ACTIVE',
     );
   }
