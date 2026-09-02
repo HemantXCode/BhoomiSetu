@@ -68,8 +68,8 @@ def run_integration_test():
         req = urllib.request.Request(f"{BASE_URL}/api/v1/field/tasks/101", headers=headers)
         res = urllib.request.urlopen(req)
         detail_data = json.loads(res.read().decode())
-        parcel_num = detail_data["data"]["parcel"]["parcel_number"]
-        log_step("5. GET /api/v1/field/tasks/101", detail_data["success"], f"Parcel Number: {parcel_num}")
+        ulpin = detail_data["data"]["parcel"].get("ulpin") or detail_data["data"]["parcel"].get("parcel_number")
+        log_step("5. GET /api/v1/field/tasks/101", detail_data["success"], f"ULPIN: {ulpin}")
     except Exception as e:
         log_step("5. GET /api/v1/field/tasks/101", False, str(e))
 

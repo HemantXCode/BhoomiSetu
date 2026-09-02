@@ -18,8 +18,8 @@ class AppConstants {
   static const String demoState = 'Maharashtra';
   static const String demoDistrict = 'Pune';
 
-  // Default API Base URL (ADB Reverse / Localhost)
-  static const String defaultApiBaseUrl = 'http://127.0.0.1:5000';
+  // Default API Base URL (FastAPI Backend / ADB Reverse / Localhost)
+  static const String defaultApiBaseUrl = 'http://127.0.0.1:8000';
 
   // GPS Accuracy threshold in meters (threshold for warning banner)
   static const double gpsAccuracyThresholdMeters = 15.0;

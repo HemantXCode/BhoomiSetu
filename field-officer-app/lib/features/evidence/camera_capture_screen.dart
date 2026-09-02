@@ -108,7 +108,7 @@ class _CameraCaptureScreenState extends ConsumerState<CameraCaptureScreen> {
     return Scaffold(
       appBar: BhoomiAppBar(
         title: 'Evidence Capture',
-        subtitle: 'Parcel ${widget.task.parcelId}',
+        subtitle: 'ULPIN: ${widget.task.ulpin}',
         showBack: true,
         actions: [
           TextButton.icon(

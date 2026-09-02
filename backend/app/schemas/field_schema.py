@@ -14,7 +14,8 @@ class VerificationCreateSchema(BaseModel):
     device_id: Optional[str] = None
     task_id: int
     visit_id: int
-    parcel_id: int
+    ulpin: Optional[str] = None
+    parcel_id: Optional[Any] = None
     latitude: Optional[float] = Field(None, ge=-90.0, le=90.0)
     longitude: Optional[float] = Field(None, ge=-180.0, le=180.0)
     accuracy_meters: Optional[float] = Field(None, ge=0.0)

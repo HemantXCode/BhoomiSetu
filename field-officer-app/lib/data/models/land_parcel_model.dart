@@ -1,5 +1,5 @@
 class LandParcelModel {
-  final String parcelId;
+  final String ulpin;
   final String surveyNumber;
   final String village;
   final String district;
@@ -12,7 +12,8 @@ class LandParcelModel {
   final String status;
 
   LandParcelModel({
-    required this.parcelId,
+    String? ulpin,
+    String? parcelId,
     required this.surveyNumber,
     required this.village,
     required this.district,
@@ -23,11 +24,13 @@ class LandParcelModel {
     required this.landType,
     required this.ownerName,
     required this.status,
-  });
+  }) : ulpin = ulpin ?? parcelId ?? '';
+
+  String get parcelId => ulpin;
 
   factory LandParcelModel.fromJson(Map<String, dynamic> json) {
     return LandParcelModel(
-      parcelId: (json['parcelId'] ?? json['parcel_id'] ?? json['id'])?.toString() ?? '',
+      ulpin: (json['ulpin'] ?? json['parcelId'] ?? json['parcel_id'] ?? json['id'])?.toString() ?? '',
       surveyNumber: json['surveyNumber'] as String? ?? json['survey_number'] as String? ?? '',
       village: json['village'] as String? ?? '',
       district: json['district'] as String? ?? 'Pune',
@@ -43,7 +46,8 @@ class LandParcelModel {
 
   Map<String, dynamic> toJson() {
     return {
-      'parcelId': parcelId,
+      'ulpin': ulpin,
+      'parcelId': ulpin,
       'surveyNumber': surveyNumber,
       'village': village,
       'district': district,

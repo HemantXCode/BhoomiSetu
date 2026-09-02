@@ -12,6 +12,8 @@ class BhoomiButton extends StatelessWidget {
   final double? width;
   final double height;
 
+  final double? fontSize;
+
   const BhoomiButton({
     super.key,
     required this.text,
@@ -21,6 +23,7 @@ class BhoomiButton extends StatelessWidget {
     this.isLoading = false,
     this.width,
     this.height = 50,
+    this.fontSize,
   });
 
   @override
@@ -31,25 +34,29 @@ class BhoomiButton extends StatelessWidget {
       children: [
         if (isLoading) ...[
           SizedBox(
-            width: 20,
-            height: 20,
+            width: 18,
+            height: 18,
             child: CircularProgressIndicator(
               strokeWidth: 2.2,
               valueColor: AlwaysStoppedAnimation<Color>(_getTextColor()),
             ),
           ),
-          const SizedBox(width: 10),
-        ] else if (icon != null) ...[
-          Icon(icon, size: 20, color: _getTextColor()),
           const SizedBox(width: 8),
+        ] else if (icon != null) ...[
+          Icon(icon, size: 18, color: _getTextColor()),
+          const SizedBox(width: 6),
         ],
-        Text(
-          text,
-          style: TextStyle(
-            fontSize: 15,
-            fontWeight: FontWeight.w700,
-            color: _getTextColor(),
-            letterSpacing: 0.3,
+        Flexible(
+          child: Text(
+            text,
+            style: TextStyle(
+              fontSize: fontSize ?? 13.5,
+              fontWeight: FontWeight.w700,
+              color: _getTextColor(),
+              letterSpacing: 0.2,
+            ),
+            overflow: TextOverflow.ellipsis,
+            maxLines: 1,
           ),
         ),
       ],

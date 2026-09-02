@@ -36,29 +36,28 @@ class TaskDetailsScreen extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Parcel ID: ${task.parcelId}',
-                              style: const TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w800,
-                                color: AppColors.secondary,
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'ULPIN: ${task.ulpin}',
+                                style: AppTextStyles.h3,
                               ),
-                            ),
-                            const SizedBox(height: 2),
-                            Text(
-                              'Survey Number: ${task.surveyNumber}',
-                              style: const TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w600,
-                                color: AppColors.textSecondary,
+                              const SizedBox(height: 2),
+                              Text(
+                                'Survey Number: ${task.surveyNumber}',
+                                style: const TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.textSecondary,
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
-                        StatusBadge(status: task.status),
+                        const SizedBox(width: 8),
+                        StatusBadge(status: task.status, compact: true),
                       ],
                     ),
                     const Divider(height: 24),

@@ -1,17 +1,21 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { LanguageProvider } from './context/LanguageContext';
 import ProtectedRoute from './components/layout/ProtectedRoute';
 
 // Pages
 import LoginPage from './pages/auth/LoginPage';
 import AccessDenied from './pages/auth/AccessDenied';
+import ExecutiveDashboardPage from './pages/dashboard/ExecutiveDashboardPage';
 import CentralDashboard from './pages/central/CentralDashboard';
 import StateDashboard from './pages/state/StateDashboard';
 import DistrictDashboard from './pages/district/DistrictDashboard';
 import AgencyDashboard from './pages/agency/AgencyDashboard';
-import FieldDashboard from './pages/field/FieldDashboard';
+import FieldOfficerDashboard from './pages/field/FieldOfficerDashboard';
+import MobileInspectionPage from './pages/mobile/MobileInspectionPage';
 import ProjectsList from './pages/projects/ProjectsList';
+import GISCommandCenterPage from './pages/gis/GISCommandCenterPage';
 
 function RootRedirect() {
   const { isAuthenticated, user, getDashboardRouteForRole, loading } = useAuth();
@@ -33,80 +37,112 @@ function RootRedirect() {
 
 export default function App() {
   return (
-    <AuthProvider>
-      <BrowserRouter>
-        <Routes>
-          {/* Public Routes */}
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/access-denied" element={<AccessDenied />} />
+    <LanguageProvider>
+      <AuthProvider>
+        <BrowserRouter>
+          <Routes>
+            {/* Public Routes */}
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/access-denied" element={<AccessDenied />} />
 
-          {/* Root Redirect based on Role */}
-          <Route path="/" element={<RootRedirect />} />
+            {/* Root Redirect based on Role */}
+            <Route path="/" element={<RootRedirect />} />
 
-          {/* 1. Central Ministry Dashboard */}
-          <Route
-            path="/central/dashboard"
-            element={
-              <ProtectedRoute allowedRoles={['CENTRAL_MINISTRY']}>
-                <CentralDashboard />
-              </ProtectedRoute>
-            }
-          />
+            {/* Unified Executive Dashboard (Role-Adaptive) */}
+            <Route
+              path="/dashboard"
+              element={
+                <ProtectedRoute>
+                  <ExecutiveDashboardPage />
+                </ProtectedRoute>
+              }
+            />
 
-          {/* 2. State Government Dashboard */}
-          <Route
-            path="/state/dashboard"
-            element={
-              <ProtectedRoute allowedRoles={['STATE_GOVERNMENT']}>
-                <StateDashboard />
-              </ProtectedRoute>
-            }
-          />
+            {/* Dedicated Ground Inspection & Mobile Evidence Hub */}
+            <Route
+              path="/mobile-inspection"
+              element={
+                <ProtectedRoute>
+                  <MobileInspectionPage />
+                </ProtectedRoute>
+              }
+            />
 
-          {/* 3. District Authority Dashboard */}
-          <Route
-            path="/district/dashboard"
-            element={
-              <ProtectedRoute allowedRoles={['DISTRICT_AUTHORITY']}>
-                <DistrictDashboard />
-              </ProtectedRoute>
-            }
-          />
+            {/* Legacy / Direct Role Dashboard Routes */}
+            <Route
+              path="/central/dashboard"
+              element={
+                <ProtectedRoute allowedRoles={['CENTRAL_MINISTRY']}>
+                  <CentralDashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/state/dashboard"
+              element={
+                <ProtectedRoute allowedRoles={['STATE_GOVERNMENT']}>
+                  <StateDashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/district/dashboard"
+              element={
+                <ProtectedRoute allowedRoles={['DISTRICT_AUTHORITY']}>
+                  <DistrictDashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/agency/dashboard"
+              element={
+                <ProtectedRoute allowedRoles={['PROJECT_AGENCY']}>
+                  <AgencyDashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/field/dashboard"
+              element={
+                <ProtectedRoute allowedRoles={['FIELD_OFFICER']}>
+                  <FieldOfficerDashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/field/mobile-inspection"
+              element={<Navigate to="/mobile-inspection" replace />}
+            />
 
-          {/* 4. Project Agency Dashboard */}
-          <Route
-            path="/agency/dashboard"
-            element={
-              <ProtectedRoute allowedRoles={['PROJECT_AGENCY']}>
-                <AgencyDashboard />
-              </ProtectedRoute>
-            }
-          />
+            {/* Common Projects Directory (Scope Enforced) */}
+            <Route
+              path="/projects"
+              element={
+                <ProtectedRoute>
+                  <ProjectsList />
+                </ProtectedRoute>
+              }
+            />
 
-          {/* 5. Field Officer Dashboard */}
-          <Route
-            path="/field/dashboard"
-            element={
-              <ProtectedRoute allowedRoles={['FIELD_OFFICER']}>
-                <FieldDashboard />
-              </ProtectedRoute>
-            }
-          />
+            {/* Advanced GIS Command Center */}
+            <Route
+              path="/gis"
+              element={
+                <ProtectedRoute>
+                  <GISCommandCenterPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/gis-command-center"
+              element={<Navigate to="/gis" replace />}
+            />
 
-          {/* Common Projects Directory (Scope Enforced) */}
-          <Route
-            path="/projects"
-            element={
-              <ProtectedRoute>
-                <ProjectsList />
-              </ProtectedRoute>
-            }
-          />
-
-          {/* Catch-all */}
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-      </BrowserRouter>
-    </AuthProvider>
+            {/* Catch-all */}
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </BrowserRouter>
+      </AuthProvider>
+    </LanguageProvider>
   );
 }

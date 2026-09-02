@@ -87,3 +87,23 @@ CREATE INDEX IF NOT EXISTS idx_projects_agency_id ON projects(agency_id);
 CREATE INDEX IF NOT EXISTS idx_projects_state_id ON projects(state_id);
 CREATE INDEX IF NOT EXISTS idx_projects_district_id ON projects(district_id);
 CREATE INDEX IF NOT EXISTS idx_projects_status ON projects(status);
+
+-- 6. LAND PARCELS
+CREATE TABLE IF NOT EXISTS land_parcels (
+    id SERIAL PRIMARY KEY,
+    project_id INTEGER NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+    ulpin VARCHAR(100) NOT NULL UNIQUE,
+    survey_number VARCHAR(100) NOT NULL,
+    village VARCHAR(100) NOT NULL,
+    state_id INTEGER NOT NULL REFERENCES states(id) ON DELETE RESTRICT,
+    district_id INTEGER NOT NULL REFERENCES districts(id) ON DELETE RESTRICT,
+    area_hectares NUMERIC(10, 4) NOT NULL,
+    classification VARCHAR(50) NOT NULL DEFAULT 'AGRICULTURAL',
+    owner_name VARCHAR(200) NOT NULL,
+    status VARCHAR(50) NOT NULL DEFAULT 'IDENTIFIED',
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_land_parcels_project_id ON land_parcels(project_id);
+CREATE INDEX IF NOT EXISTS idx_land_parcels_ulpin ON land_parcels(ulpin);
+

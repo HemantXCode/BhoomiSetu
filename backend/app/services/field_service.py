@@ -35,8 +35,9 @@ def get_assigned_field_tasks(db: Session, user: User, status_filter: Optional[st
             "id": t.id,
             "project_id": t.project_id,
             "project_name": project.project_name if project else None,
+            "ulpin": parcel.ulpin if parcel else None,
             "parcel_id": t.parcel_id,
-            "parcel_number": parcel.parcel_number if parcel else None,
+            "parcel_number": parcel.ulpin if parcel else None,
             "survey_number": parcel.survey_number if parcel else None,
             "village": parcel.village if parcel else None,
             "owner_name": parcel.owner_name if parcel else None,
@@ -87,7 +88,8 @@ def get_field_task_by_id(db: Session, task_id: int, user: User):
         "project_name": project.project_name if project else None,
         "parcel": {
             "id": parcel.id,
-            "parcel_number": parcel.parcel_number,
+            "ulpin": parcel.ulpin,
+            "parcel_number": parcel.ulpin,
             "survey_number": parcel.survey_number,
             "village": parcel.village,
             "area_hectares": float(parcel.area_hectares) if parcel.area_hectares else 0.0,
@@ -187,8 +189,9 @@ def get_field_visits(db: Session, user: User, task_id: Optional[int] = None):
         results.append({
             "id": v.id,
             "task_id": v.task_id,
+            "ulpin": parcel.ulpin if parcel else None,
             "parcel_id": parcel.id if parcel else None,
-            "parcel_number": parcel.parcel_number if parcel else None,
+            "parcel_number": parcel.ulpin if parcel else None,
             "village": parcel.village if parcel else None,
             "field_officer_id": v.field_officer_id,
             "officer_name": officer.name if officer else "Field Officer",
@@ -228,8 +231,9 @@ def get_field_visit_by_id(db: Session, visit_id: int, user: User):
     return {
         "id": visit.id,
         "task_id": visit.task_id,
+        "ulpin": parcel.ulpin if parcel else None,
         "parcel_id": parcel.id if parcel else None,
-        "parcel_number": parcel.parcel_number if parcel else None,
+        "parcel_number": parcel.ulpin if parcel else None,
         "village": parcel.village if parcel else None,
         "officer_id": visit.field_officer_id,
         "officer_name": officer.name if officer else "Field Officer",
@@ -305,10 +309,22 @@ def submit_field_verification(db: Session, user: User, verification_data: Dict[s
             db.flush()
             visit_id = new_visit.id
 
+    raw_ulpin = verification_data.get("ulpin")
+    raw_parcel_id = verification_data.get("parcel_id")
+    parcel_entity = None
+    if raw_ulpin:
+        parcel_entity = db.query(LandParcel).filter(LandParcel.ulpin == str(raw_ulpin)).first()
+    if not parcel_entity and raw_parcel_id is not None:
+        parcel_entity = db.query(LandParcel).filter((LandParcel.id == raw_parcel_id) | (LandParcel.ulpin == str(raw_parcel_id))).first()
+    if not parcel_entity and task:
+        parcel_entity = db.query(LandParcel).filter(LandParcel.id == task.parcel_id).first()
+
+    target_parcel_id = parcel_entity.id if parcel_entity else (task.parcel_id if task else 1)
+
     new_ver = FieldVerification(
         visit_id=visit_id,
         task_id=task_id,
-        parcel_id=verification_data.get("parcel_id", task.parcel_id),
+        parcel_id=target_parcel_id,
         checklist_data=verification_data.get("checklist_data"),
         remarks=verification_data.get("remarks"),
         client_event_id=client_event_id,
@@ -332,6 +348,7 @@ def submit_field_verification(db: Session, user: User, verification_data: Dict[s
         new_value={
             "verification_id": new_ver.id,
             "task_id": task_id,
+            "ulpin": parcel_entity.ulpin if parcel_entity else str(new_ver.parcel_id),
             "parcel_id": new_ver.parcel_id,
             "client_event_id": client_event_id
         }
@@ -345,6 +362,7 @@ def submit_field_verification(db: Session, user: User, verification_data: Dict[s
         "client_event_id": new_ver.client_event_id,
         "task_id": new_ver.task_id,
         "visit_id": new_ver.visit_id,
+        "ulpin": parcel_entity.ulpin if parcel_entity else None,
         "status": "SUBMITTED",
         "verified_at": new_ver.verified_at.isoformat() if new_ver.verified_at else None
     }
@@ -374,8 +392,9 @@ def get_field_verifications(db: Session, user: User, task_id: Optional[int] = No
             "task_id": v.task_id,
             "task_type": task.task_type if task else "Field Verification",
             "project_name": project.project_name if project else None,
+            "ulpin": parcel.ulpin if parcel else None,
             "parcel_id": v.parcel_id,
-            "parcel_number": parcel.parcel_number if parcel else None,
+            "parcel_number": parcel.ulpin if parcel else None,
             "survey_number": parcel.survey_number if parcel else None,
             "village": parcel.village if parcel else None,
             "owner_name": parcel.owner_name if parcel else None,
@@ -468,6 +487,7 @@ def process_batch_sync(db: Session, user: User, sync_data: Dict[str, Any], reque
                     "device_id": device_id,
                     "task_id": payload.get("task_id", 101),
                     "visit_id": payload.get("visit_id", 1),
+                    "ulpin": payload.get("ulpin") or payload.get("parcel_id") or payload.get("parcelId"),
                     "parcel_id": payload.get("parcel_id", 1),
                     "checklist_data": payload.get("checklist_data"),
                     "remarks": payload.get("remarks")

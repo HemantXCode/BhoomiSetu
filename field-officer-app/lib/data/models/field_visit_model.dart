@@ -5,7 +5,7 @@ import 'document_model.dart';
 class FieldVisitModel {
   final String visitId;
   final String taskId;
-  final String parcelId;
+  final String ulpin;
   final String officerId;
   final String startTime;
   final String? endTime;
@@ -24,7 +24,8 @@ class FieldVisitModel {
   FieldVisitModel({
     required this.visitId,
     required this.taskId,
-    required this.parcelId,
+    String? ulpin,
+    String? parcelId,
     required this.officerId,
     required this.startTime,
     this.endTime,
@@ -39,13 +40,15 @@ class FieldVisitModel {
     this.inspection,
     this.evidence = const [],
     this.documents = const [],
-  });
+  }) : ulpin = ulpin ?? parcelId ?? '';
+
+  String get parcelId => ulpin;
 
   factory FieldVisitModel.fromJson(Map<String, dynamic> json) {
     return FieldVisitModel(
       visitId: (json['visitId'] ?? json['visit_id'] ?? json['id'])?.toString() ?? '',
       taskId: (json['taskId'] ?? json['task_id'])?.toString() ?? '',
-      parcelId: (json['parcelId'] ?? json['parcel_id'])?.toString() ?? '',
+      ulpin: (json['ulpin'] ?? json['parcelId'] ?? json['parcel_id'])?.toString() ?? '',
       officerId: (json['officerId'] ?? json['officer_id'] ?? json['field_officer_id'])?.toString() ?? '',
       startTime: json['startTime'] as String? ?? json['start_time'] as String? ?? json['visit_start'] as String? ?? '',
       endTime: json['endTime'] as String? ?? json['end_time'] as String?,
@@ -73,7 +76,8 @@ class FieldVisitModel {
     return {
       'visitId': visitId,
       'taskId': taskId,
-      'parcelId': parcelId,
+      'ulpin': ulpin,
+      'parcelId': ulpin,
       'officerId': officerId,
       'startTime': startTime,
       'endTime': endTime,
@@ -108,7 +112,7 @@ class FieldVisitModel {
     return FieldVisitModel(
       visitId: visitId,
       taskId: taskId,
-      parcelId: parcelId,
+      ulpin: ulpin,
       officerId: officerId,
       startTime: startTime,
       endTime: endTime ?? this.endTime,

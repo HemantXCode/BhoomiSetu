@@ -33,7 +33,7 @@ class MockDataSource {
     return [
       FieldTaskModel(
         id: 'TSK-1024',
-        parcelId: 'PUN-1024',
+        ulpin: 'ULPIN-MH-PUN-1024',
         project: 'Pune Ring Road Express Corridor',
         village: 'Bhugaon',
         district: 'Pune',
@@ -51,7 +51,7 @@ class MockDataSource {
       ),
       FieldTaskModel(
         id: 'TSK-1025',
-        parcelId: 'PUN-1025',
+        ulpin: 'ULPIN-MH-PUN-1025',
         project: 'Pune Ring Road Express Corridor',
         village: 'Lavale',
         district: 'Pune',
@@ -69,7 +69,7 @@ class MockDataSource {
       ),
       FieldTaskModel(
         id: 'TSK-1026',
-        parcelId: 'PUN-1026',
+        ulpin: 'ULPIN-MH-PUN-1026',
         project: 'Pune Ring Road Express Corridor',
         village: 'Pirangut',
         district: 'Pune',
@@ -87,7 +87,7 @@ class MockDataSource {
       ),
       FieldTaskModel(
         id: 'TSK-1027',
-        parcelId: 'PUN-1027',
+        ulpin: 'ULPIN-MH-PUN-1027',
         project: 'Pune Ring Road Express Corridor',
         village: 'Mulshi',
         district: 'Pune',
@@ -105,7 +105,7 @@ class MockDataSource {
       ),
       FieldTaskModel(
         id: 'TSK-1028',
-        parcelId: 'PUN-1028',
+        ulpin: 'ULPIN-MH-PUN-1028',
         project: 'Pune Ring Road Express Corridor',
         village: 'Haveli',
         district: 'Pune',
@@ -127,7 +127,7 @@ class MockDataSource {
   static List<LandParcelModel> getInitialParcels() {
     return [
       LandParcelModel(
-        parcelId: 'PUN-1024',
+        ulpin: 'ULPIN-MH-PUN-1024',
         surveyNumber: '48/2A',
         village: 'Bhugaon',
         district: 'Pune',
@@ -140,7 +140,7 @@ class MockDataSource {
         status: 'PENDING',
       ),
       LandParcelModel(
-        parcelId: 'PUN-1025',
+        ulpin: 'ULPIN-MH-PUN-1025',
         surveyNumber: '112/1B',
         village: 'Lavale',
         district: 'Pune',
@@ -153,7 +153,7 @@ class MockDataSource {
         status: 'IN_PROGRESS',
       ),
       LandParcelModel(
-        parcelId: 'PUN-1026',
+        ulpin: 'ULPIN-MH-PUN-1026',
         surveyNumber: '74/3',
         village: 'Pirangut',
         district: 'Pune',
@@ -166,7 +166,7 @@ class MockDataSource {
         status: 'PENDING',
       ),
       LandParcelModel(
-        parcelId: 'PUN-1027',
+        ulpin: 'ULPIN-MH-PUN-1027',
         surveyNumber: '19/A',
         village: 'Mulshi',
         district: 'Pune',
@@ -186,7 +186,7 @@ class MockDataSource {
       NotificationModel(
         id: 'notif_1',
         title: 'New Task Assigned',
-        message: 'Parcel PUN-1026 (Pirangut) assigned for Land Inspection.',
+        message: 'Parcel ULPIN-MH-PUN-1026 (Pirangut) assigned for Land Inspection.',
         type: 'TASK_ASSIGNED',
         timestamp: DateTime.now().subtract(const Duration(minutes: 45)),
         isRead: false,
@@ -195,11 +195,11 @@ class MockDataSource {
       NotificationModel(
         id: 'notif_2',
         title: 'Verification Approved',
-        message: 'Parcel PUN-1028 field report verified by CALA Officer.',
+        message: 'Parcel ULPIN-MH-PUN-1028 field report verified by CALA Officer.',
         type: 'VERIFICATION_UPDATE',
         timestamp: DateTime.now().subtract(const Duration(hours: 4)),
         isRead: false,
-        relatedId: 'PUN-1028',
+        relatedId: 'ULPIN-MH-PUN-1028',
       ),
       NotificationModel(
         id: 'notif_3',

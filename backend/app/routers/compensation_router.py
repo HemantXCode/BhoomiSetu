@@ -24,19 +24,36 @@ def get_awards(project_id: Optional[int] = Query(None), user = Depends(get_curre
     } for a in awards]
     return api_response(status_code=200, success=True, message="Awards retrieved.", data=data)
 
+from app.models.parcel import LandParcel
+
 @router.get("/assessments")
-def get_assessments(parcel_id: Optional[int] = Query(None), user = Depends(get_current_user), db: Session = Depends(get_db)):
+def get_assessments(
+    ulpin: Optional[str] = Query(None),
+    parcel_id: Optional[int] = Query(None),
+    user = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
     query = db.query(CompensationAssessment)
-    if parcel_id:
+    if ulpin:
+        parcel = db.query(LandParcel).filter(LandParcel.ulpin == ulpin).first()
+        if parcel:
+            query = query.filter(CompensationAssessment.parcel_id == parcel.id)
+        else:
+            return api_response(status_code=200, success=True, message="Compensation assessments retrieved.", data=[])
+    elif parcel_id:
         query = query.filter(CompensationAssessment.parcel_id == parcel_id)
     items = query.all()
-    data = [{
-        "id": c.id,
-        "parcel_id": c.parcel_id,
-        "land_value": float(c.land_value),
-        "structure_value": float(c.structure_value),
-        "solatium": float(c.solatium),
-        "total_amount": float(c.total_amount),
-        "status": c.status
-    } for c in items]
+    data = []
+    for c in items:
+        p = db.query(LandParcel).filter(LandParcel.id == c.parcel_id).first()
+        data.append({
+            "id": c.id,
+            "ulpin": p.ulpin if p else None,
+            "parcel_id": c.parcel_id,
+            "land_value": float(c.land_value),
+            "structure_value": float(c.structure_value),
+            "solatium": float(c.solatium),
+            "total_amount": float(c.total_amount),
+            "status": c.status
+        })
     return api_response(status_code=200, success=True, message="Compensation assessments retrieved.", data=data)

@@ -1,6 +1,6 @@
 class FieldTaskModel {
   final String id;
-  final String parcelId;
+  final String ulpin;
   final String project;
   final String village;
   final String district;
@@ -19,7 +19,8 @@ class FieldTaskModel {
 
   FieldTaskModel({
     required this.id,
-    required this.parcelId,
+    String? ulpin,
+    String? parcelId,
     required this.project,
     required this.village,
     required this.district,
@@ -35,16 +36,18 @@ class FieldTaskModel {
     required this.instructions,
     this.remarks,
     this.syncStatus = 'SYNCED',
-  });
+  }) : ulpin = ulpin ?? parcelId ?? '';
+
+  String get parcelId => ulpin;
 
   factory FieldTaskModel.fromJson(Map<String, dynamic> json) {
     final rawId = json['id']?.toString() ?? '';
-    final rawParcelId = (json['parcelId'] ?? json['parcel_id'])?.toString() ?? '';
+    final rawUlpin = (json['ulpin'] ?? json['parcel_number'] ?? json['parcelId'] ?? json['parcel_id'])?.toString() ?? '';
     final project = json['project'] as String? ?? json['project_name'] as String? ?? 'Pune Ring Road Express Corridor';
     final village = json['village'] as String? ?? '';
     final district = json['district'] as String? ?? json['district_name'] as String? ?? 'Pune';
     final state = json['state'] as String? ?? json['state_name'] as String? ?? 'Maharashtra';
-    final surveyNumber = json['surveyNumber'] as String? ?? json['survey_number'] as String? ?? (rawParcelId.isNotEmpty ? 'Gat No. $rawParcelId' : '');
+    final surveyNumber = json['surveyNumber'] as String? ?? json['survey_number'] as String? ?? (rawUlpin.isNotEmpty ? 'Gat No. $rawUlpin' : '');
     final landAreaSqM = (json['landAreaSqM'] as num?)?.toDouble() ??
         (json['land_area_sqm'] as num?)?.toDouble() ??
         (((json['area_hectares'] as num?)?.toDouble() ?? 0.0) * 10000.0);
@@ -60,7 +63,7 @@ class FieldTaskModel {
 
     return FieldTaskModel(
       id: rawId,
-      parcelId: rawParcelId,
+      ulpin: rawUlpin,
       project: project,
       village: village,
       district: district,
@@ -82,7 +85,8 @@ class FieldTaskModel {
   Map<String, dynamic> toJson() {
     return {
       'id': id,
-      'parcelId': parcelId,
+      'ulpin': ulpin,
+      'parcelId': ulpin,
       'project': project,
       'village': village,
       'district': district,
@@ -108,7 +112,7 @@ class FieldTaskModel {
   }) {
     return FieldTaskModel(
       id: id,
-      parcelId: parcelId,
+      ulpin: ulpin,
       project: project,
       village: village,
       district: district,

@@ -53,8 +53,11 @@ class _ParcelVerificationScreenState extends ConsumerState<ParcelVerificationScr
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    Wrap(
+                      alignment: WrapAlignment.spaceBetween,
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      spacing: 8,
+                      runSpacing: 6,
                       children: [
                         const Text('Cadastral Alignment Check', style: AppTextStyles.h3),
                         Container(
@@ -67,7 +70,7 @@ class _ParcelVerificationScreenState extends ConsumerState<ParcelVerificationScr
                           child: Text(
                             isWithin ? 'WITHIN EXPECTED RANGE' : 'OUTSIDE EXPECTED RANGE',
                             style: TextStyle(
-                              fontSize: 11,
+                              fontSize: 10.5,
                               fontWeight: FontWeight.w800,
                               color: isWithin ? AppColors.success : AppColors.warning,
                             ),

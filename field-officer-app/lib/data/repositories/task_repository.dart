@@ -44,7 +44,7 @@ class MockTaskRepository implements ITaskRepository {
   Future<FieldTaskModel?> getTaskById(String taskId) async {
     final tasks = await getTasks();
     try {
-      return tasks.firstWhere((t) => t.id == taskId || t.parcelId == taskId);
+      return tasks.firstWhere((t) => t.id == taskId || t.ulpin == taskId || t.parcelId == taskId);
     } catch (_) {
       return null;
     }
@@ -57,7 +57,7 @@ class MockTaskRepository implements ITaskRepository {
 
   @override
   Future<void> updateTaskStatus(String taskId, String status, {String? syncStatus}) async {
-    final index = _memoryTasks.indexWhere((t) => t.id == taskId || t.parcelId == taskId);
+    final index = _memoryTasks.indexWhere((t) => t.id == taskId || t.ulpin == taskId || t.parcelId == taskId);
     if (index != -1) {
       _memoryTasks[index] = _memoryTasks[index].copyWith(
         status: status,
@@ -157,7 +157,7 @@ class ApiTaskRepository implements ITaskRepository {
             final feat = f as Map<String, dynamic>;
             final props = (feat['properties'] as Map<String, dynamic>?) ?? {};
             return LandParcelModel(
-              parcelId: (props['id'] ?? props['parcel_number'] ?? '').toString(),
+              ulpin: (props['ulpin'] ?? props['id'] ?? props['parcel_number'] ?? '').toString(),
               surveyNumber: props['survey_number'] as String? ?? '',
               village: props['village'] as String? ?? 'Haveli',
               district: props['district'] as String? ?? 'Pune',

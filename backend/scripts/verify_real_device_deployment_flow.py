@@ -33,7 +33,7 @@ def run_real_device_validation():
     assert len(tasks) > 0
     assigned_task = tasks[0]
     task_id = assigned_task["id"]
-    print(f"[2. Assigned Tasks] PASS | Total Tasks: {len(tasks)} | Selected Task ID: {task_id} ({assigned_task['task_type']}) | Parcel: {assigned_task['parcel_number']}")
+    print(f"[2. Assigned Tasks] PASS | Total Tasks: {len(tasks)} | Selected Task ID: {task_id} ({assigned_task['task_type']}) | ULPIN: {assigned_task.get('ulpin') or assigned_task.get('parcel_number')}")
 
     # 3. Create / Start Field Visit
     visit_res = client.post(f"{BASE_URL}/field/visits", headers=headers, json={

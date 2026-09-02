@@ -48,13 +48,17 @@ class BhoomiAppBar extends StatelessWidget implements PreferredSizeWidget {
                 ),
               ),
               const SizedBox(width: 6),
-              Text(
-                title,
-                style: const TextStyle(
-                  fontSize: 17,
-                  fontWeight: FontWeight.w700,
-                  color: Colors.white,
-                  letterSpacing: -0.2,
+              Flexible(
+                child: Text(
+                  title,
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                  style: const TextStyle(
+                    fontSize: 17,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.white,
+                    letterSpacing: -0.2,
+                  ),
                 ),
               ),
             ],
@@ -63,6 +67,8 @@ class BhoomiAppBar extends StatelessWidget implements PreferredSizeWidget {
             const SizedBox(height: 2),
             Text(
               subtitle!,
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
               style: const TextStyle(
                 fontSize: 11,
                 fontWeight: FontWeight.w400,

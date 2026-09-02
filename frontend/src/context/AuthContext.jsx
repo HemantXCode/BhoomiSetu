@@ -59,20 +59,8 @@ export const AuthProvider = ({ children }) => {
   };
 
   const getDashboardRouteForRole = (role) => {
-    switch (role) {
-      case 'CENTRAL_MINISTRY':
-        return '/central/dashboard';
-      case 'STATE_GOVERNMENT':
-        return '/state/dashboard';
-      case 'DISTRICT_AUTHORITY':
-        return '/district/dashboard';
-      case 'PROJECT_AGENCY':
-        return '/agency/dashboard';
-      case 'FIELD_OFFICER':
-        return '/field/dashboard';
-      default:
-        return '/login';
-    }
+    if (!role) return '/login';
+    return '/dashboard';
   };
 
   return (

@@ -30,7 +30,7 @@ class TasksScreen extends ConsumerWidget {
             child: TextField(
               onChanged: controller.searchTasks,
               decoration: InputDecoration(
-                hintText: 'Search by Parcel ID, Village, Survey No...',
+                hintText: 'Search by ULPIN, Village, Survey No...',
                 prefixIcon: const Icon(Icons.search, size: 20, color: AppColors.textMuted),
                 contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                 filled: true,
@@ -99,41 +99,59 @@ class TasksScreen extends ConsumerWidget {
                                   child: Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
+                                      // Row 1: ULPIN Badge on Left, Status Badge on Right
                                       Row(
                                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        crossAxisAlignment: CrossAxisAlignment.center,
                                         children: [
-                                          Row(
-                                            children: [
-                                              Container(
-                                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                                decoration: BoxDecoration(
-                                                  color: AppColors.secondary,
-                                                  borderRadius: BorderRadius.circular(6),
-                                                ),
-                                                child: Text(
-                                                  task.parcelId,
-                                                  style: const TextStyle(
-                                                    fontSize: 13,
-                                                    fontWeight: FontWeight.w800,
-                                                    color: Colors.white,
-                                                  ),
-                                                ),
+                                          Flexible(
+                                            child: Container(
+                                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4.5),
+                                              decoration: BoxDecoration(
+                                                color: AppColors.secondary,
+                                                borderRadius: BorderRadius.circular(6),
                                               ),
-                                              const SizedBox(width: 8),
-                                              Text(
-                                                task.village,
+                                              child: Text(
+                                                task.ulpin,
                                                 style: const TextStyle(
-                                                  fontSize: 15,
-                                                  fontWeight: FontWeight.w700,
-                                                  color: AppColors.textPrimary,
+                                                  fontSize: 12.5,
+                                                  fontWeight: FontWeight.w800,
+                                                  color: Colors.white,
+                                                  letterSpacing: 0.3,
                                                 ),
+                                                overflow: TextOverflow.ellipsis,
+                                                maxLines: 1,
                                               ),
-                                            ],
+                                            ),
                                           ),
-                                          StatusBadge(status: task.status),
+                                          const SizedBox(width: 8),
+                                          StatusBadge(status: task.status, compact: true),
                                         ],
                                       ),
-                                      const SizedBox(height: 10),
+                                      const SizedBox(height: 8),
+
+                                      // Row 2: Village & Location
+                                      Row(
+                                        children: [
+                                          const Icon(Icons.location_on, size: 15, color: AppColors.primary),
+                                          const SizedBox(width: 4),
+                                          Expanded(
+                                            child: Text(
+                                              '${task.village}, ${task.district}',
+                                              style: const TextStyle(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w700,
+                                                color: AppColors.textPrimary,
+                                              ),
+                                              overflow: TextOverflow.ellipsis,
+                                              maxLines: 1,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 8),
+
+                                      // Row 3: Task Description
                                       Text(
                                         'Task: ${task.taskType}',
                                         style: const TextStyle(
@@ -141,37 +159,55 @@ class TasksScreen extends ConsumerWidget {
                                           fontWeight: FontWeight.w600,
                                           color: AppColors.textPrimary,
                                         ),
+                                        overflow: TextOverflow.ellipsis,
+                                        maxLines: 2,
                                       ),
                                       const SizedBox(height: 4),
+
+                                      // Row 4: Survey Number & Area
                                       Row(
                                         children: [
                                           const Icon(Icons.crop_free, size: 14, color: AppColors.textMuted),
                                           const SizedBox(width: 4),
-                                          Text(
-                                            'Survey No: ${task.surveyNumber} • ${task.landAreaSqM} sq.m',
-                                            style: const TextStyle(fontSize: 12, color: AppColors.textMuted),
+                                          Expanded(
+                                            child: Text(
+                                              'Survey No: ${task.surveyNumber} • ${task.landAreaSqM} sq.m',
+                                              style: const TextStyle(fontSize: 12, color: AppColors.textMuted),
+                                              overflow: TextOverflow.ellipsis,
+                                              maxLines: 1,
+                                            ),
                                           ),
                                         ],
                                       ),
                                       const Divider(height: 20),
+
+                                      // Row 5: Due Date and Details
                                       Row(
                                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                         children: [
-                                          Row(
-                                            children: [
-                                              const Icon(Icons.event, size: 14, color: AppColors.textMuted),
-                                              const SizedBox(width: 4),
-                                              Text(
-                                                'Due: ${DateFormatter.formatDateString(task.dueDate)}',
-                                                style: const TextStyle(
-                                                  fontSize: 12,
-                                                  fontWeight: FontWeight.w600,
-                                                  color: AppColors.textSecondary,
+                                          Expanded(
+                                            child: Row(
+                                              children: [
+                                                const Icon(Icons.event, size: 14, color: AppColors.textMuted),
+                                                const SizedBox(width: 4),
+                                                Expanded(
+                                                  child: Text(
+                                                    'Due: ${DateFormatter.formatDateString(task.dueDate)}',
+                                                    style: const TextStyle(
+                                                      fontSize: 12,
+                                                      fontWeight: FontWeight.w600,
+                                                      color: AppColors.textSecondary,
+                                                    ),
+                                                    overflow: TextOverflow.ellipsis,
+                                                    maxLines: 1,
+                                                  ),
                                                 ),
-                                              ),
-                                            ],
+                                              ],
+                                            ),
                                           ),
+                                          const SizedBox(width: 8),
                                           const Row(
+                                            mainAxisSize: MainAxisSize.min,
                                             children: [
                                               Text(
                                                 'Details',

@@ -6,13 +6,16 @@ import '../../core/utils/date_formatter.dart';
 
 class SubmissionSuccessScreen extends StatelessWidget {
   final String visitId;
-  final String parcelId;
+  final String ulpin;
 
   const SubmissionSuccessScreen({
     super.key,
     required this.visitId,
-    required this.parcelId,
-  });
+    String? ulpin,
+    String? parcelId,
+  }) : ulpin = ulpin ?? parcelId ?? '';
+
+  String get parcelId => ulpin;
 
   @override
   Widget build(BuildContext context) {
@@ -71,7 +74,7 @@ class SubmissionSuccessScreen extends StatelessWidget {
                     padding: const EdgeInsets.all(16),
                     child: Column(
                       children: [
-                        _buildTicketRow('Parcel Identifier', parcelId, isBold: true),
+                        _buildTicketRow('ULPIN', ulpin, isBold: true),
                         const Divider(height: 16),
                         _buildTicketRow('Visit Session ID', visitId),
                         const Divider(height: 16),

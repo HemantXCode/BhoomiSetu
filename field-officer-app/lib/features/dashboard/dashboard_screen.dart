@@ -372,10 +372,14 @@ class DashboardScreen extends ConsumerWidget {
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              'Parcel ${task.parcelId}',
-              style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w800, color: AppColors.secondary),
+            Expanded(
+              child: Text(
+                'ULPIN: ${task.ulpin}',
+                style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: AppColors.secondary),
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
+            const SizedBox(width: 8),
             StatusBadge(status: task.status, compact: true),
           ],
         ),
@@ -387,11 +391,13 @@ class DashboardScreen extends ConsumerWidget {
               Text(
                 'Task: ${task.taskType} • Survey No: ${task.surveyNumber}',
                 style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: AppColors.textPrimary),
+                overflow: TextOverflow.ellipsis,
               ),
               const SizedBox(height: 2),
               Text(
                 'Village: ${task.village}, ${task.district} • Area: ${task.landAreaSqM} sq.m',
                 style: const TextStyle(fontSize: 12, color: AppColors.textMuted),
+                overflow: TextOverflow.ellipsis,
               ),
             ],
           ),

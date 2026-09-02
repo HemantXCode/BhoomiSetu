@@ -21,7 +21,7 @@ class LandParcel(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     project_id = Column(Integer, ForeignKey("projects.id", ondelete="CASCADE"), nullable=False, index=True)
-    parcel_number = Column(String(100), nullable=False, unique=True)
+    ulpin = Column(String(100), nullable=False, unique=True, index=True)
     survey_number = Column(String(100), nullable=False)
     village = Column(String(100), nullable=False)
     state_id = Column(Integer, ForeignKey("states.id", ondelete="RESTRICT"), nullable=False)
@@ -32,6 +32,14 @@ class LandParcel(Base):
     status = Column(String(50), nullable=False, default="IDENTIFIED")
     geometry = Column(SpatialPolygon, nullable=True)
     created_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
+
+    @property
+    def parcel_number(self):
+        return self.ulpin
+
+    @parcel_number.setter
+    def parcel_number(self, value):
+        self.ulpin = value
 
     project = relationship("Project", back_populates="parcels")
     surveys = relationship("ParcelSurvey", back_populates="parcel", cascade="all, delete-orphan")

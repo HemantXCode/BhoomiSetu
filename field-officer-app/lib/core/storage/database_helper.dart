@@ -30,7 +30,8 @@ class DatabaseHelper {
     await db.execute('''
       CREATE TABLE tasks (
         id TEXT PRIMARY KEY,
-        parcelId TEXT NOT NULL,
+        ulpin TEXT NOT NULL,
+        parcelId TEXT,
         project TEXT NOT NULL,
         village TEXT NOT NULL,
         district TEXT NOT NULL,
@@ -54,7 +55,8 @@ class DatabaseHelper {
       CREATE TABLE field_visits (
         visitId TEXT PRIMARY KEY,
         taskId TEXT NOT NULL,
-        parcelId TEXT NOT NULL,
+        ulpin TEXT NOT NULL,
+        parcelId TEXT,
         officerId TEXT NOT NULL,
         startTime TEXT NOT NULL,
         endTime TEXT,
@@ -97,7 +99,8 @@ class DatabaseHelper {
       CREATE TABLE evidence (
         photoId TEXT PRIMARY KEY,
         visitId TEXT NOT NULL,
-        parcelId TEXT NOT NULL,
+        ulpin TEXT NOT NULL,
+        parcelId TEXT,
         officerId TEXT NOT NULL,
         timestamp TEXT NOT NULL,
         latitude REAL,
@@ -115,7 +118,8 @@ class DatabaseHelper {
       CREATE TABLE documents (
         documentId TEXT PRIMARY KEY,
         visitId TEXT NOT NULL,
-        parcelId TEXT NOT NULL,
+        ulpin TEXT NOT NULL,
+        parcelId TEXT,
         fileName TEXT NOT NULL,
         fileType TEXT NOT NULL,
         fileSizeBytes INTEGER NOT NULL,

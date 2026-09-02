@@ -89,9 +89,9 @@ def seed_database():
         # 6. LAND PARCELS
         if db.query(LandParcel).count() == 0:
             parcels_data = [
-                LandParcel(id=1, project_id=1, parcel_number="PARCEL-MH-PUN-001", survey_number="Gat No. 142/3A", village="Haveli", state_id=1, district_id=1, area_hectares=12.50, classification="AGRICULTURAL", owner_name="Ramesh Chandra Patil", status="IDENTIFIED"),
-                LandParcel(id=2, project_id=1, parcel_number="PARCEL-MH-PUN-002", survey_number="Gat No. 89/1B", village="Mulshi", state_id=1, district_id=1, area_hectares=8.20, classification="AGRICULTURAL", owner_name="Sunita Deshmukh", status="SURVEYED"),
-                LandParcel(id=3, project_id=2, parcel_number="PARCEL-MH-PUN-003", survey_number="Survey No. 45/2", village="Bhosari", state_id=1, district_id=1, area_hectares=15.80, classification="COMMERCIAL", owner_name="Mahesh Pawar", status="NOTIFICATION_ISSUED")
+                LandParcel(id=1, project_id=1, ulpin="ULPIN-MH-PUN-001", survey_number="Gat No. 142/3A", village="Haveli", state_id=1, district_id=1, area_hectares=12.50, classification="AGRICULTURAL", owner_name="Ramesh Chandra Patil", status="IDENTIFIED"),
+                LandParcel(id=2, project_id=1, ulpin="ULPIN-MH-PUN-002", survey_number="Gat No. 89/1B", village="Mulshi", state_id=1, district_id=1, area_hectares=8.20, classification="AGRICULTURAL", owner_name="Sunita Deshmukh", status="SURVEYED"),
+                LandParcel(id=3, project_id=2, ulpin="ULPIN-MH-PUN-003", survey_number="Survey No. 45/2", village="Bhosari", state_id=1, district_id=1, area_hectares=15.80, classification="COMMERCIAL", owner_name="Mahesh Pawar", status="NOTIFICATION_ISSUED")
             ]
             db.add_all(parcels_data)
             db.commit()

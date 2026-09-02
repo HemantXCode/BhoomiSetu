@@ -69,8 +69,8 @@ def seed_test_db(db):
     db.commit()
 
     parcels_data = [
-        LandParcel(id=1, project_id=1, parcel_number="PARCEL-MH-PUN-001", survey_number="Gat No. 142/3A", village="Haveli", state_id=1, district_id=1, area_hectares=12.50, classification="AGRICULTURAL", owner_name="Ramesh Chandra Patil", status="IDENTIFIED"),
-        LandParcel(id=2, project_id=1, parcel_number="PARCEL-MH-PUN-002", survey_number="Gat No. 89/1B", village="Mulshi", state_id=1, district_id=1, area_hectares=8.20, classification="AGRICULTURAL", owner_name="Sunita Deshmukh", status="SURVEYED")
+        LandParcel(id=1, project_id=1, ulpin="ULPIN-MH-PUN-001", survey_number="Gat No. 142/3A", village="Haveli", state_id=1, district_id=1, area_hectares=12.50, classification="AGRICULTURAL", owner_name="Ramesh Chandra Patil", status="IDENTIFIED"),
+        LandParcel(id=2, project_id=1, ulpin="ULPIN-MH-PUN-002", survey_number="Gat No. 89/1B", village="Mulshi", state_id=1, district_id=1, area_hectares=8.20, classification="AGRICULTURAL", owner_name="Sunita Deshmukh", status="SURVEYED")
     ]
     db.add_all(parcels_data)
     db.commit()

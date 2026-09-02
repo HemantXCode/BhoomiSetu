@@ -206,26 +206,28 @@ class _GPSCaptureScreenState extends ConsumerState<GPSCaptureScreen> {
                     const SizedBox(height: 6),
                     if (visitState.calculatedDistanceMeters != null) ...[
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                         decoration: BoxDecoration(
                           color: visitState.isWithinRange ? AppColors.successBg : AppColors.warningBg,
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: Row(
-                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Icon(
                               visitState.isWithinRange ? Icons.check_circle : Icons.warning_amber,
-                              size: 14,
+                              size: 16,
                               color: visitState.isWithinRange ? AppColors.success : AppColors.warning,
                             ),
                             const SizedBox(width: 6),
-                            Text(
-                              'Distance to Benchmark: ${visitState.calculatedDistanceMeters!.toStringAsFixed(1)}m (${visitState.isWithinRange ? "Within Expected Range" : "Outside Expected Range"})',
-                              style: TextStyle(
-                                fontSize: 11,
-                                fontWeight: FontWeight.w700,
-                                color: visitState.isWithinRange ? AppColors.success : AppColors.warning,
+                            Expanded(
+                              child: Text(
+                                'Distance to Benchmark: ${visitState.calculatedDistanceMeters!.toStringAsFixed(1)}m (${visitState.isWithinRange ? "Within Expected Range" : "Outside Expected Range"})',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w700,
+                                  color: visitState.isWithinRange ? AppColors.success : AppColors.warning,
+                                ),
                               ),
                             ),
                           ],
@@ -259,7 +261,7 @@ class _GPSCaptureScreenState extends ConsumerState<GPSCaptureScreen> {
               icon: Icons.my_location,
               onPressed: _acquireLocation,
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 16),
           ],
         ),
       ),
@@ -270,25 +272,25 @@ class _GPSCaptureScreenState extends ConsumerState<GPSCaptureScreen> {
     return Padding(
       padding: const EdgeInsets.only(bottom: 10.0),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Row(
-            children: [
-              Icon(icon, size: 16, color: AppColors.textMuted),
-              const SizedBox(width: 8),
-              Text(
-                label,
-                style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: AppColors.textSecondary),
-              ),
-            ],
-          ),
+          Icon(icon, size: 16, color: AppColors.textMuted),
+          const SizedBox(width: 8),
           Text(
-            value,
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w700,
-              fontFamily: 'monospace',
-              color: isHighlight ? AppColors.primary : AppColors.textPrimary,
+            label,
+            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: AppColors.textSecondary),
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              value,
+              textAlign: TextAlign.right,
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w700,
+                fontFamily: 'monospace',
+                color: isHighlight ? AppColors.primary : AppColors.textPrimary,
+              ),
             ),
           ),
         ],

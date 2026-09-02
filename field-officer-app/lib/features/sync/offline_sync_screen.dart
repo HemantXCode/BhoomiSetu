@@ -138,29 +138,37 @@ class OfflineSyncScreen extends ConsumerWidget {
                                 children: [
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    crossAxisAlignment: CrossAxisAlignment.center,
                                     children: [
-                                      Row(
-                                        children: [
-                                          Icon(
-                                            item.entityType == 'FIELD_VISIT'
-                                                ? Icons.assignment_turned_in
-                                                : item.entityType == 'EVIDENCE'
-                                                    ? Icons.camera_alt
-                                                    : Icons.upload_file,
-                                            size: 18,
-                                            color: AppColors.secondary,
-                                          ),
-                                          const SizedBox(width: 6),
-                                          Text(
-                                            '${item.operation}: ${item.entityType}',
-                                            style: const TextStyle(
-                                              fontSize: 13,
-                                              fontWeight: FontWeight.w800,
-                                              color: AppColors.textPrimary,
+                                      Expanded(
+                                        child: Row(
+                                          children: [
+                                            Icon(
+                                              item.entityType == 'FIELD_VISIT'
+                                                  ? Icons.assignment_turned_in
+                                                  : item.entityType == 'EVIDENCE'
+                                                      ? Icons.camera_alt
+                                                      : Icons.upload_file,
+                                              size: 18,
+                                              color: AppColors.secondary,
                                             ),
-                                          ),
-                                        ],
+                                            const SizedBox(width: 6),
+                                            Expanded(
+                                              child: Text(
+                                                '${item.operation}: ${item.entityType}',
+                                                style: const TextStyle(
+                                                  fontSize: 13,
+                                                  fontWeight: FontWeight.w800,
+                                                  color: AppColors.textPrimary,
+                                                ),
+                                                overflow: TextOverflow.ellipsis,
+                                                maxLines: 1,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
                                       ),
+                                      const SizedBox(width: 8),
                                       StatusBadge(status: item.syncStatus, compact: true),
                                     ],
                                   ),
@@ -172,6 +180,8 @@ class OfflineSyncScreen extends ConsumerWidget {
                                       fontWeight: FontWeight.w600,
                                       color: AppColors.textSecondary,
                                     ),
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 1,
                                   ),
                                   const SizedBox(height: 2),
                                   Text(
@@ -181,21 +191,29 @@ class OfflineSyncScreen extends ConsumerWidget {
                                       fontFamily: 'monospace',
                                       color: AppColors.textMuted,
                                     ),
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 1,
                                   ),
                                   if (item.lastError != null) ...[
                                     const SizedBox(height: 6),
                                     Text(
                                       'Error: ${item.lastError}',
                                       style: const TextStyle(fontSize: 11, color: AppColors.danger),
+                                      overflow: TextOverflow.ellipsis,
+                                      maxLines: 2,
                                     ),
                                   ],
                                   const Divider(height: 16),
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Text(
-                                        'Retries: ${item.retryCount}/5 • ${item.createdAt.substring(0, 10)}',
-                                        style: const TextStyle(fontSize: 11, color: AppColors.textMuted),
+                                      Expanded(
+                                        child: Text(
+                                          'Retries: ${item.retryCount}/5 • ${item.createdAt.length >= 10 ? item.createdAt.substring(0, 10) : item.createdAt}',
+                                          style: const TextStyle(fontSize: 11, color: AppColors.textMuted),
+                                          overflow: TextOverflow.ellipsis,
+                                          maxLines: 1,
+                                        ),
                                       ),
                                       if (item.syncStatus != 'SYNCED')
                                         TextButton.icon(

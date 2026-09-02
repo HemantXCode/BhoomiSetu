@@ -132,12 +132,12 @@ export default function DistrictDashboard() {
 
   const fieldQueueColumns = [
     {
-      header: 'Verification ID / Parcel',
+      header: 'Verification ID / ULPIN',
       accessor: 'id',
       render: (row) => (
         <div>
           <span className="font-bold font-mono text-orange-700 block">{row.id}</span>
-          <span className="text-xs text-slate-800 font-semibold">{row.parcel_no}</span>
+          <span className="text-xs text-slate-800 font-semibold">{row.ulpin || row.parcel_no}</span>
         </div>
       )
     },
@@ -345,7 +345,7 @@ export default function DistrictDashboard() {
               columns={fieldQueueColumns}
               data={fieldQueue}
               itemsPerPage={5}
-              searchPlaceholder="Search parcel or village..."
+              searchPlaceholder="Search ULPIN or village..."
             />
           )}
 
@@ -504,7 +504,7 @@ export default function DistrictDashboard() {
                   Field Inspection Submission Details
                 </span>
                 <h3 className="text-lg font-bold text-slate-900 mt-1">
-                  {selectedVerification.parcel_no} • {selectedVerification.village}
+                  {selectedVerification.ulpin || selectedVerification.parcel_no} • {selectedVerification.village}
                 </h3>
                 <p className="text-xs text-slate-600">{selectedVerification.project_name}</p>
               </div>

@@ -16,7 +16,8 @@ import 'sync_repository.dart';
 abstract class IFieldVisitRepository {
   Future<FieldVisitModel> createOrGetVisit({
     required String taskId,
-    required String parcelId,
+    String? ulpin,
+    String? parcelId,
     required String officerId,
   });
 
@@ -45,9 +46,11 @@ class MockFieldVisitRepository implements IFieldVisitRepository {
   @override
   Future<FieldVisitModel> createOrGetVisit({
     required String taskId,
-    required String parcelId,
+    String? ulpin,
+    String? parcelId,
     required String officerId,
   }) async {
+    final effectiveUlpin = ulpin ?? parcelId ?? '';
     final db = await _dbHelper.database;
     final List<Map<String, dynamic>> existing = await db.query(
       'field_visits',
@@ -71,7 +74,7 @@ class MockFieldVisitRepository implements IFieldVisitRepository {
     final visit = FieldVisitModel(
       visitId: newVisitId,
       taskId: taskId,
-      parcelId: parcelId,
+      ulpin: effectiveUlpin,
       officerId: officerId,
       startTime: DateTime.now().toUtc().toIso8601String(),
       status: 'IN_PROGRESS',
@@ -81,7 +84,8 @@ class MockFieldVisitRepository implements IFieldVisitRepository {
     await db.insert('field_visits', {
       'visitId': visit.visitId,
       'taskId': visit.taskId,
-      'parcelId': visit.parcelId,
+      'ulpin': visit.ulpin,
+      'parcelId': visit.ulpin,
       'officerId': visit.officerId,
       'startTime': visit.startTime,
       'status': visit.status,
@@ -244,10 +248,12 @@ class ApiFieldVisitRepository implements IFieldVisitRepository {
   @override
   Future<FieldVisitModel> createOrGetVisit({
     required String taskId,
-    required String parcelId,
+    String? ulpin,
+    String? parcelId,
     required String officerId,
   }) async {
-    final visit = await localFallback.createOrGetVisit(taskId: taskId, parcelId: parcelId, officerId: officerId);
+    final effectiveUlpin = ulpin ?? parcelId ?? '';
+    final visit = await localFallback.createOrGetVisit(taskId: taskId, ulpin: effectiveUlpin, officerId: officerId);
     try {
       final taskIdInt = int.tryParse(taskId) ?? 101;
       await apiClient.post(ApiEndpoints.visits, data: {
@@ -283,7 +289,7 @@ class ApiFieldVisitRepository implements IFieldVisitRepository {
       if (await file.exists()) {
         final formData = FormData.fromMap({
           'file': await MultipartFile.fromFile(evidence.localFilePath, filename: evidence.fileName),
-          'related_entity_id': int.tryParse(evidence.parcelId) ?? int.tryParse(evidence.visitId) ?? 101,
+          'related_entity_id': int.tryParse(evidence.ulpin) ?? int.tryParse(evidence.visitId) ?? 101,
         });
         await apiClient.post(ApiEndpoints.photos, data: formData);
       }
@@ -306,7 +312,7 @@ class ApiFieldVisitRepository implements IFieldVisitRepository {
         final formData = FormData.fromMap({
           'file': await MultipartFile.fromFile(document.localFilePath, filename: document.fileName),
           'related_entity': 'FIELD_VISIT',
-          'related_entity_id': int.tryParse(document.parcelId) ?? int.tryParse(document.visitId) ?? 101,
+          'related_entity_id': int.tryParse(document.ulpin) ?? int.tryParse(document.visitId) ?? 101,
         });
         await apiClient.post(ApiEndpoints.documentUpload, data: formData);
       }
@@ -328,12 +334,13 @@ class ApiFieldVisitRepository implements IFieldVisitRepository {
       if (completeVisit != null) {
         final clientEventId = 'EVT_${const Uuid().v4()}';
         final taskIdInt = int.tryParse(completeVisit.taskId) ?? 101;
-        final parcelIdInt = int.tryParse(completeVisit.parcelId) ?? 1;
+        final parcelIdInt = int.tryParse(completeVisit.ulpin) ?? 1;
         final payload = {
           "client_event_id": clientEventId,
           "device_id": "android-flutter-app",
           "task_id": taskIdInt,
           "visit_id": 1,
+          "ulpin": completeVisit.ulpin,
           "parcel_id": parcelIdInt,
           "latitude": completeVisit.latitude ?? 18.5204,
           "longitude": completeVisit.longitude ?? 73.8567,

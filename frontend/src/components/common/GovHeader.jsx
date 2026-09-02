@@ -1,21 +1,22 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
+import { useLanguage } from '../../context/LanguageContext';
 import { Bell, User, LogOut, Globe, PhoneCall, ShieldCheck } from 'lucide-react';
 import GovEmblem from './GovEmblem';
 
 export default function GovHeader() {
   const { user, logout } = useAuth();
-  const [lang, setLang] = useState('English');
+  const { language, setLanguage, t } = useLanguage();
   const [fontSize, setFontSize] = useState('A');
 
   const getRoleDisplayName = (role) => {
     switch (role) {
-      case 'CENTRAL_MINISTRY': return 'Central Ministry (National PMU)';
-      case 'STATE_GOVERNMENT': return `State Government (${user?.state_name || 'Revenue Dept'})`;
-      case 'DISTRICT_AUTHORITY': return `District Collector / LAO (${user?.district_name || 'District'})`;
-      case 'PROJECT_AGENCY': return `Implementing Agency (${user?.agency_name || 'PSU'})`;
-      case 'FIELD_OFFICER': return `Field Revenue Officer (${user?.district_name || 'Field Unit'})`;
-      default: return role || 'Authorized Officer';
+      case 'CENTRAL_MINISTRY': return t('roles.CENTRAL_MINISTRY');
+      case 'STATE_GOVERNMENT': return `${t('roles.STATE_GOVERNMENT')} (${user?.state_name || 'Revenue'})`;
+      case 'DISTRICT_AUTHORITY': return `${t('roles.DISTRICT_AUTHORITY')} (${user?.district_name || 'District'})`;
+      case 'PROJECT_AGENCY': return `${t('roles.PROJECT_AGENCY')} (${user?.agency_name || 'PSU'})`;
+      case 'FIELD_OFFICER': return `${t('roles.FIELD_OFFICER')} (${user?.district_name || 'Unit'})`;
+      default: return role || t('roles.authorizedOfficer');
     }
   };
 
@@ -29,16 +30,16 @@ export default function GovHeader() {
         <div className="flex items-center gap-3">
           <span className="font-semibold text-slate-100 flex items-center gap-1.5">
             <span className="inline-block w-2 h-2 rounded-full bg-green-400"></span>
-            Government of India | भारत सरकार
+            {t('common.govIndia')}
           </span>
           <span className="hidden md:inline text-slate-400">|</span>
-          <span className="hidden md:inline text-slate-300">Ministry of Rural Development & MoRTH</span>
+          <span className="hidden md:inline text-slate-300">{t('common.ministry')}</span>
         </div>
 
         <div className="flex items-center gap-4 text-[11px]">
           {/* Accessibility Font Size Adjuster */}
           <div className="hidden sm:flex items-center gap-1 bg-slate-800 px-2 py-0.5 rounded text-slate-300">
-            <span>Font:</span>
+            <span>{t('common.font')}</span>
             <button 
               onClick={() => setFontSize('A-')} 
               className={`px-1 hover:text-white ${fontSize === 'A-' ? 'text-orange-400 font-bold' : ''}`}
@@ -59,21 +60,34 @@ export default function GovHeader() {
             </button>
           </div>
 
-          {/* Language Switch */}
-          <div className="flex items-center gap-1.5 cursor-pointer">
+          {/* Language Switch: English | हिन्दी */}
+          <div className="flex items-center gap-1.5 bg-slate-800/80 px-2 py-0.5 rounded border border-slate-700">
             <Globe className="w-3.5 h-3.5 text-orange-400" />
             <button 
-              onClick={() => setLang(lang === 'English' ? 'हिंदी' : 'English')}
-              className="hover:text-orange-300 font-medium"
+              onClick={() => setLanguage('en')}
+              className={`px-1.5 py-0.5 rounded text-[11px] font-semibold transition-colors cursor-pointer ${
+                language === 'en' ? 'bg-orange-600 text-white shadow-xs' : 'text-slate-300 hover:text-white'
+              }`}
+              title="Switch to English"
             >
-              {lang === 'English' ? 'हिंदी' : 'English'}
+              English
+            </button>
+            <span className="text-slate-500">|</span>
+            <button 
+              onClick={() => setLanguage('hi')}
+              className={`px-1.5 py-0.5 rounded text-[11px] font-semibold transition-colors cursor-pointer ${
+                language === 'hi' ? 'bg-orange-600 text-white shadow-xs' : 'text-slate-300 hover:text-white'
+              }`}
+              title="हिन्दी में बदलें"
+            >
+              हिन्दी
             </button>
           </div>
 
           {/* Helpdesk */}
           <div className="hidden sm:flex items-center gap-1 text-slate-300">
             <PhoneCall className="w-3.5 h-3.5 text-green-400" />
-            <span>Toll-Free: 1800-11-BHOOMI (24x7)</span>
+            <span>{t('common.tollFree')}</span>
           </div>
         </div>
       </div>
@@ -95,14 +109,14 @@ export default function GovHeader() {
                 BHOOMISETU
               </h1>
               <span className="bg-orange-100 text-[#D9531E] border border-orange-200 text-[10px] font-bold px-2 py-0.5 rounded tracking-wide font-sans">
-                NATIONAL PORTAL
+                {t('common.officialPortal')}
               </span>
             </div>
             <p className="text-xs sm:text-sm text-slate-700 font-medium">
-              Real-Time National Land Acquisition & Management System
+              {t('common.tagline')}
             </p>
             <p className="text-[11px] text-slate-500 hidden sm:block">
-              Connecting Land, People & Governance • Digital Land Lifecycle Platform
+              {t('common.subTagline')}
             </p>
           </div>
         </div>
@@ -112,7 +126,7 @@ export default function GovHeader() {
           <div className="flex items-center gap-3 w-full md:w-auto justify-end border-t md:border-t-0 pt-2 md:pt-0 border-slate-100">
             {/* Notification Bell */}
             <button 
-              className="relative p-2 text-slate-600 hover:text-[#D9531E] hover:bg-orange-50 rounded border border-slate-200"
+              className="relative p-2 text-slate-600 hover:text-[#D9531E] hover:bg-orange-50 rounded border border-slate-200 cursor-pointer"
               title="System Alerts"
             >
               <Bell className="w-4 h-4" />
@@ -136,11 +150,11 @@ export default function GovHeader() {
             {/* Logout Button */}
             <button
               onClick={logout}
-              className="gov-btn-secondary py-1.5 px-3 text-xs text-red-700 hover:bg-red-50 hover:border-red-300"
+              className="gov-btn-secondary py-1.5 px-3 text-xs text-red-700 hover:bg-red-50 hover:border-red-300 cursor-pointer"
               title="Secure Sign Out"
             >
               <LogOut className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Logout</span>
+              <span className="hidden sm:inline">{t('common.logout')}</span>
             </button>
           </div>
         )}

@@ -13,6 +13,7 @@ import '../../data/repositories/task_repository.dart';
 import '../../data/repositories/sync_repository.dart';
 import '../../data/repositories/field_visit_repository.dart';
 import '../../data/repositories/notification_repository.dart';
+import '../../data/repositories/project_corridor_repository.dart';
 
 // Reactive Data Mode Provider
 final dataModeProvider = StateProvider<DataMode>((ref) => ApiConfig.dataMode);
@@ -105,6 +106,10 @@ final fieldVisitRepositoryProvider = Provider<IFieldVisitRepository>((ref) {
 final notificationRepositoryProvider = Provider<INotificationRepository>((ref) {
   final dbHelper = ref.watch(dbHelperProvider);
   return MockNotificationRepository(dbHelper: dbHelper);
+});
+
+final projectCorridorRepositoryProvider = Provider<IProjectCorridorRepository>((ref) {
+  return DemoProjectCorridorRepository();
 });
 
 // Connectivity State Provider

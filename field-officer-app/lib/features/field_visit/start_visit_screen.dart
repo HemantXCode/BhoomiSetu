@@ -90,23 +90,32 @@ class _StartVisitScreenState extends ConsumerState<StartVisitScreen> {
                         ),
                         const SizedBox(height: 12),
                         Text(
-                          'Parcel ID: ${widget.task.parcelId} (${widget.task.village})',
+                          'ULPIN: ${widget.task.ulpin} (${widget.task.village})',
                           style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: Colors.white),
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 2,
                         ),
                         const SizedBox(height: 4),
                         Text(
                           'Survey No: ${widget.task.surveyNumber} • Area: ${widget.task.landAreaSqM} sq.m',
                           style: const TextStyle(fontSize: 13, color: Color(0xFFCBD5E1)),
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
                         ),
                         const Divider(color: Colors.white24, height: 20),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text(
-                              'Started: ${DateFormatter.formatDateTime(DateTime.now())}',
-                              style: const TextStyle(fontSize: 12, color: Color(0xFF94A3B8)),
+                            Expanded(
+                              child: Text(
+                                'Started: ${DateFormatter.formatDateTime(DateTime.now())}',
+                                style: const TextStyle(fontSize: 12, color: Color(0xFF94A3B8)),
+                                overflow: TextOverflow.ellipsis,
+                              ),
                             ),
+                            const SizedBox(width: 8),
                             const Row(
+                              mainAxisSize: MainAxisSize.min,
                               children: [
                                 Icon(Icons.shield_outlined, size: 14, color: AppColors.primaryLight),
                                 SizedBox(width: 4),

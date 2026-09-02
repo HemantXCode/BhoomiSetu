@@ -1,6 +1,7 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { useLanguage } from '../../context/LanguageContext';
 import { 
   LayoutDashboard, 
   FolderKanban, 
@@ -16,77 +17,69 @@ import {
 
 export default function GovNavbar() {
   const { user } = useAuth();
+  const { t } = useLanguage();
   if (!user) return null;
 
   const role = user.role;
 
   // Define authorized links based on role
   const getNavItems = () => {
-    const dashboardPath = (() => {
-      switch (role) {
-        case 'CENTRAL_MINISTRY': return '/central/dashboard';
-        case 'STATE_GOVERNMENT': return '/state/dashboard';
-        case 'DISTRICT_AUTHORITY': return '/district/dashboard';
-        case 'PROJECT_AGENCY': return '/agency/dashboard';
-        case 'FIELD_OFFICER': return '/field/dashboard';
-        default: return '/login';
-      }
-    })();
-
     const baseItems = [
-      { name: 'Dashboard', path: dashboardPath, icon: LayoutDashboard, exact: true },
-      { name: 'Projects Directory', path: '/projects', icon: FolderKanban }
+      { name: t('nav.dashboard'), path: '/dashboard', icon: LayoutDashboard, exact: true },
+      { name: t('nav.projects'), path: '/projects', icon: FolderKanban }
     ];
 
     if (role === 'CENTRAL_MINISTRY') {
       return [
         ...baseItems,
-        { name: 'National GIS Map (Ph-4)', path: '#gis-map', icon: Map, badge: 'Phase 4' },
-        { name: 'Compensation (Ph-5)', path: '#compensation', icon: Coins, badge: 'Phase 5' },
-        { name: 'R&R Management (Ph-6)', path: '#rr', icon: Users, badge: 'Phase 6' },
-        { name: 'MIS Reports (Ph-9)', path: '#mis', icon: BarChart3, badge: 'Phase 9' },
-        { name: 'Help & Manuals', path: '#help', icon: HelpCircle }
+        { name: t('nav.mobileInspection'), path: '/mobile-inspection', icon: Smartphone },
+        { name: t('nav.gisCommandCenter'), path: '/gis', icon: Map },
+        { name: t('nav.compensation'), path: '#compensation', icon: Coins, badge: 'Phase 5' },
+        { name: t('nav.rrManagement'), path: '#rr', icon: Users, badge: 'Phase 6' },
+        { name: t('nav.misReports'), path: '#mis', icon: BarChart3, badge: 'Phase 9' },
+        { name: t('nav.helpManuals'), path: '#help', icon: HelpCircle }
       ];
     }
 
     if (role === 'STATE_GOVERNMENT') {
       return [
         ...baseItems,
-        { name: 'State GIS Map (Ph-4)', path: '#gis-map', icon: Map, badge: 'Phase 4' },
-        { name: 'State Approvals', path: '#approvals', icon: FileCheck2 },
-        { name: 'Compensation (Ph-5)', path: '#compensation', icon: Coins, badge: 'Phase 5' },
-        { name: 'State MIS (Ph-9)', path: '#mis', icon: BarChart3, badge: 'Phase 9' },
-        { name: 'Help & Manuals', path: '#help', icon: HelpCircle }
+        { name: t('nav.mobileInspection'), path: '/mobile-inspection', icon: Smartphone },
+        { name: t('nav.gisCommandCenter'), path: '/gis', icon: Map },
+        { name: t('nav.stateApprovals'), path: '#approvals', icon: FileCheck2 },
+        { name: t('nav.compensation'), path: '#compensation', icon: Coins, badge: 'Phase 5' },
+        { name: t('nav.stateMis'), path: '#mis', icon: BarChart3, badge: 'Phase 9' },
+        { name: t('nav.helpManuals'), path: '#help', icon: HelpCircle }
       ];
     }
 
     if (role === 'DISTRICT_AUTHORITY') {
       return [
         ...baseItems,
-        { name: 'Field Queue', path: '#field-queue', icon: FileCheck2 },
-        { name: 'Land Cadastral Map (Ph-4)', path: '#gis-map', icon: Map, badge: 'Phase 4' },
-        { name: 'Disbursement (Ph-5)', path: '#compensation', icon: Coins, badge: 'Phase 5' },
-        { name: 'District MIS (Ph-9)', path: '#mis', icon: BarChart3, badge: 'Phase 9' },
-        { name: 'Help & Manuals', path: '#help', icon: HelpCircle }
+        { name: t('nav.mobileInspection'), path: '/mobile-inspection', icon: Smartphone },
+        { name: t('nav.cadastralMap'), path: '/gis', icon: Map },
+        { name: t('nav.disbursement'), path: '#compensation', icon: Coins, badge: 'Phase 5' },
+        { name: t('nav.districtMis'), path: '#mis', icon: BarChart3, badge: 'Phase 9' },
+        { name: t('nav.helpManuals'), path: '#help', icon: HelpCircle }
       ];
     }
 
     if (role === 'PROJECT_AGENCY') {
       return [
         ...baseItems,
-        { name: 'Project Proposals', path: '#proposals', icon: FileText },
-        { name: 'Agency GIS (Ph-4)', path: '#gis-map', icon: Map, badge: 'Phase 4' },
-        { name: 'Milestone Tracker', path: '#milestones', icon: BarChart3 },
-        { name: 'Help & Manuals', path: '#help', icon: HelpCircle }
+        { name: t('nav.mobileInspection'), path: '/mobile-inspection', icon: Smartphone },
+        { name: t('nav.corridorGis'), path: '/gis', icon: Map },
+        { name: t('nav.milestoneTracker'), path: '#milestones', icon: BarChart3 },
+        { name: t('nav.helpManuals'), path: '#help', icon: HelpCircle }
       ];
     }
 
     if (role === 'FIELD_OFFICER') {
       return [
         ...baseItems,
-        { name: 'Mobile Inspection', path: '/field/dashboard', icon: Smartphone },
-        { name: 'GPS Verification (Ph-4)', path: '#gps', icon: Map, badge: 'Phase 4' },
-        { name: 'Help & Guidelines', path: '#help', icon: HelpCircle }
+        { name: t('nav.mobileInspection'), path: '/mobile-inspection', icon: Smartphone },
+        { name: t('nav.gisMapPins'), path: '/gis', icon: Map },
+        { name: t('nav.helpGuidelines'), path: '#help', icon: HelpCircle }
       ];
     }
 

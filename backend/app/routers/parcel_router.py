@@ -28,7 +28,8 @@ def get_land_parcels(
         data.append({
             "id": p.id,
             "project_id": p.project_id,
-            "parcel_number": p.parcel_number,
+            "ulpin": p.ulpin,
+            "parcel_number": p.ulpin,
             "survey_number": p.survey_number,
             "village": p.village,
             "area_hectares": float(p.area_hectares) if p.area_hectares else 0.0,

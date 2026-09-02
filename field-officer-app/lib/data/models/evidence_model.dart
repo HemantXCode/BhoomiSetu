@@ -1,7 +1,7 @@
 class EvidenceModel {
   final String photoId;
   final String visitId;
-  final String parcelId;
+  final String ulpin;
   final String officerId;
   final DateTime timestamp;
   final double? latitude;
@@ -15,7 +15,8 @@ class EvidenceModel {
   EvidenceModel({
     required this.photoId,
     required this.visitId,
-    required this.parcelId,
+    String? ulpin,
+    String? parcelId,
     required this.officerId,
     required this.timestamp,
     this.latitude,
@@ -25,15 +26,16 @@ class EvidenceModel {
     this.description,
     required this.localFilePath,
     this.syncStatus = 'PENDING',
-  });
+  }) : ulpin = ulpin ?? parcelId ?? '';
 
+  String get parcelId => ulpin;
   String get fileName => localFilePath.isNotEmpty ? localFilePath.split(RegExp(r'[/\\]')).last : photoId;
 
   factory EvidenceModel.fromJson(Map<String, dynamic> json) {
     return EvidenceModel(
       photoId: (json['photoId'] ?? json['photo_id'])?.toString() ?? '',
       visitId: (json['visitId'] ?? json['visit_id'])?.toString() ?? '',
-      parcelId: (json['parcelId'] ?? json['parcel_id'])?.toString() ?? '',
+      ulpin: (json['ulpin'] ?? json['parcelId'] ?? json['parcel_id'])?.toString() ?? '',
       officerId: (json['officerId'] ?? json['officer_id'])?.toString() ?? '',
       timestamp: json['timestamp'] != null
           ? DateTime.tryParse(json['timestamp'].toString()) ?? DateTime.now()
@@ -52,7 +54,8 @@ class EvidenceModel {
     return {
       'photoId': photoId,
       'visitId': visitId,
-      'parcelId': parcelId,
+      'ulpin': ulpin,
+      'parcelId': ulpin,
       'officerId': officerId,
       'timestamp': timestamp.toIso8601String(),
       'latitude': latitude,

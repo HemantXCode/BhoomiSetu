@@ -186,9 +186,9 @@ async function getDashboardStats(user) {
       status_counts: statusCounts,
       projects_list: projects,
       field_verification_queue: [
-        { id: 'FV-801', parcel_no: 'Survey No. 142/3A', village: 'Haveli', project_name: 'Pune Ring Road', officer: 'Suresh Patil', status: 'PENDING_SURVEY' },
-        { id: 'FV-802', parcel_no: 'Gat No. 89/1B', village: 'Mulshi', project_name: 'Pune Ring Road', officer: 'Suresh Patil', status: 'BOUNDARIES_FLAGGED' },
-        { id: 'FV-803', parcel_no: 'Survey No. 204/1', village: 'Khed', project_name: 'Pune-Nashik Rail', officer: 'Field Unit 2', status: 'OBJECTION_RECEIVED' }
+        { id: 'FV-801', ulpin: 'ULPIN-MH-PUN-001', parcel_no: 'ULPIN-MH-PUN-001', village: 'Haveli', project_name: 'Pune Ring Road', officer: 'Suresh Patil', status: 'PENDING_SURVEY' },
+        { id: 'FV-802', ulpin: 'ULPIN-MH-PUN-002', parcel_no: 'ULPIN-MH-PUN-002', village: 'Mulshi', project_name: 'Pune Ring Road', officer: 'Suresh Patil', status: 'BOUNDARIES_FLAGGED' },
+        { id: 'FV-803', ulpin: 'ULPIN-MH-PUN-003', parcel_no: 'ULPIN-MH-PUN-003', village: 'Khed', project_name: 'Pune-Nashik Rail', officer: 'Field Unit 2', status: 'OBJECTION_RECEIVED' }
       ],
       recent_activities: getDemoActivities(projects)
     };

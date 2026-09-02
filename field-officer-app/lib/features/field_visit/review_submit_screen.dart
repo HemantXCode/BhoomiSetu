@@ -53,7 +53,7 @@ class _ReviewSubmitScreenState extends ConsumerState<ReviewSubmitScreen> {
         (route) => route.isFirst,
         arguments: {
           'visitId': widget.visit.visitId,
-          'parcelId': widget.task.parcelId,
+          'parcelId': widget.task.ulpin,
         },
       );
     }
@@ -71,7 +71,7 @@ class _ReviewSubmitScreenState extends ConsumerState<ReviewSubmitScreen> {
     return Scaffold(
       appBar: BhoomiAppBar(
         title: 'Review & Submit Report',
-        subtitle: 'Parcel ${widget.task.parcelId}',
+        subtitle: 'ULPIN: ${widget.task.ulpin}',
         showBack: true,
       ),
       body: SingleChildScrollView(
@@ -114,7 +114,7 @@ class _ReviewSubmitScreenState extends ConsumerState<ReviewSubmitScreen> {
                   ),
                   const SizedBox(height: 10),
                   Text(
-                    'Parcel ID: ${widget.task.parcelId} • ${widget.task.village}',
+                    'ULPIN: ${widget.task.ulpin} • ${widget.task.village}',
                     style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: Colors.white),
                   ),
                   const SizedBox(height: 4),
@@ -283,10 +283,21 @@ class _ReviewSubmitScreenState extends ConsumerState<ReviewSubmitScreen> {
     return Padding(
       padding: const EdgeInsets.only(bottom: 6.0),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(label, style: const TextStyle(fontSize: 12, color: AppColors.textSecondary)),
-          Text(value, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
+          Expanded(
+            flex: 4,
+            child: Text(label, style: const TextStyle(fontSize: 12, color: AppColors.textSecondary)),
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            flex: 5,
+            child: Text(
+              value,
+              textAlign: TextAlign.right,
+              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.textPrimary),
+            ),
+          ),
         ],
       ),
     );

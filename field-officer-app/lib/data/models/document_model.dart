@@ -1,7 +1,7 @@
 class DocumentModel {
   final String documentId;
   final String visitId;
-  final String parcelId;
+  final String ulpin;
   final String fileName;
   final String fileType; // PDF, JPG, PNG, DOC, DOCX
   final int fileSizeBytes;
@@ -12,15 +12,17 @@ class DocumentModel {
   DocumentModel({
     required this.documentId,
     required this.visitId,
-    required this.parcelId,
+    String? ulpin,
+    String? parcelId,
     required this.fileName,
     required this.fileType,
     required this.fileSizeBytes,
     required this.localFilePath,
     this.uploadStatus = 'PENDING_UPLOAD',
     this.syncStatus = 'PENDING',
-  });
+  }) : ulpin = ulpin ?? parcelId ?? '';
 
+  String get parcelId => ulpin;
   String get filePath => localFilePath;
   String get title => fileName;
 
@@ -28,7 +30,7 @@ class DocumentModel {
     return DocumentModel(
       documentId: (json['documentId'] ?? json['document_id'] ?? json['id'])?.toString() ?? '',
       visitId: (json['visitId'] ?? json['visit_id'])?.toString() ?? '',
-      parcelId: (json['parcelId'] ?? json['parcel_id'])?.toString() ?? '',
+      ulpin: (json['ulpin'] ?? json['parcelId'] ?? json['parcel_id'])?.toString() ?? '',
       fileName: (json['fileName'] ?? json['file_name'] ?? json['title']) as String? ?? '',
       fileType: (json['fileType'] ?? json['file_type']) as String? ?? 'PDF',
       fileSizeBytes: (json['fileSizeBytes'] as num?)?.toInt() ?? (json['file_size_bytes'] as num?)?.toInt() ?? 0,
@@ -42,7 +44,8 @@ class DocumentModel {
     return {
       'documentId': documentId,
       'visitId': visitId,
-      'parcelId': parcelId,
+      'ulpin': ulpin,
+      'parcelId': ulpin,
       'fileName': fileName,
       'fileType': fileType,
       'fileSizeBytes': fileSizeBytes,

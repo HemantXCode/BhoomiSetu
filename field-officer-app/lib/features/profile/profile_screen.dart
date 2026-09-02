@@ -138,12 +138,21 @@ class ProfileScreen extends ConsumerWidget {
     return Padding(
       padding: const EdgeInsets.only(bottom: 10.0),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Icon(icon, size: 16, color: AppColors.textMuted),
           const SizedBox(width: 8),
           Text(label, style: const TextStyle(fontSize: 12, color: AppColors.textMuted)),
-          const Spacer(),
-          Text(value, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.textPrimary)),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              value,
+              textAlign: TextAlign.right,
+              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.textPrimary),
+              overflow: TextOverflow.ellipsis,
+              maxLines: 2,
+            ),
+          ),
         ],
       ),
     );

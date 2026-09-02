@@ -100,7 +100,7 @@ class _DocumentUploadScreenState extends ConsumerState<DocumentUploadScreen> {
     return Scaffold(
       appBar: BhoomiAppBar(
         title: 'Document Upload',
-        subtitle: 'Parcel ${widget.task.parcelId}',
+        subtitle: 'ULPIN: ${widget.task.ulpin}',
         showBack: true,
       ),
       body: SingleChildScrollView(
@@ -140,6 +140,7 @@ class _DocumentUploadScreenState extends ConsumerState<DocumentUploadScreen> {
                           child: BhoomiButton(
                             text: 'CHOOSE DOCUMENT',
                             icon: Icons.attach_file,
+                            fontSize: 12.5,
                             isLoading: _isPicking,
                             onPressed: _pickFile,
                           ),

@@ -99,7 +99,7 @@ class _InspectionFormScreenState extends ConsumerState<InspectionFormScreen> {
     return Scaffold(
       appBar: BhoomiAppBar(
         title: 'Land Inspection Checklist',
-        subtitle: 'Parcel ${widget.task.parcelId}',
+        subtitle: 'ULPIN: ${widget.task.ulpin}',
         showBack: true,
       ),
       body: Form(
@@ -302,7 +302,14 @@ class _InspectionFormScreenState extends ConsumerState<InspectionFormScreen> {
               children: [
                 Icon(icon, size: 18, color: AppColors.secondary),
                 const SizedBox(width: 8),
-                Text(title, style: AppTextStyles.h3),
+                Expanded(
+                  child: Text(
+                    title,
+                    style: AppTextStyles.h3,
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 2,
+                  ),
+                ),
               ],
             ),
             const Divider(height: 20),

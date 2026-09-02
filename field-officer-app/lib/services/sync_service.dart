@@ -64,8 +64,10 @@ class SyncService {
           final taskIdInt = int.tryParse(parsedPayload['taskId']?.toString() ?? '') ??
                             int.tryParse(parsedPayload['task_id']?.toString() ?? '') ??
                             int.tryParse(item.entityId) ?? 101;
-          final parcelIdInt = int.tryParse(parsedPayload['parcelId']?.toString() ?? '') ??
-                              int.tryParse(parsedPayload['parcel_id']?.toString() ?? '') ?? 1;
+          final ulpinStr = parsedPayload['ulpin']?.toString() ??
+                           parsedPayload['parcelId']?.toString() ??
+                           parsedPayload['parcel_id']?.toString() ?? '';
+          final parcelIdInt = int.tryParse(ulpinStr) ?? 1;
 
           return {
             "client_event_id": item.clientEventId,
@@ -74,6 +76,7 @@ class SyncService {
             "payload": {
               "task_id": taskIdInt,
               "visit_id": 1,
+              "ulpin": ulpinStr,
               "parcel_id": parcelIdInt,
               "checklist_data": parsedPayload['inspection'] ?? parsedPayload['checklist_data'] ?? {},
               "remarks": parsedPayload['remarks'] ?? "Offline field submission"

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { dashboardService } from '../../services/dashboardService';
+import { useLanguage } from '../../context/LanguageContext';
 import DashboardLayout from '../../components/layout/DashboardLayout';
 import Breadcrumbs from '../../components/common/Breadcrumbs';
 import StatCard from '../../components/common/StatCard';
@@ -21,6 +22,7 @@ import {
 } from 'lucide-react';
 
 export default function CentralDashboard() {
+  const { t } = useLanguage();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -63,7 +65,7 @@ export default function CentralDashboard() {
       )
     },
     {
-      header: 'Total Projects',
+      header: t('dashboard.totalProjects'),
       accessor: 'projects_count',
       className: 'text-center',
       render: (row) => (
@@ -73,19 +75,19 @@ export default function CentralDashboard() {
       )
     },
     {
-      header: 'Land Proposed (Ha)',
+      header: `${t('dashboard.landProposed')} (Ha)`,
       accessor: 'land_proposed',
       className: 'text-right font-mono',
       render: (row) => `${row.land_proposed} Ha`
     },
     {
-      header: 'Land Acquired (Ha)',
+      header: `${t('dashboard.landAcquired')} (Ha)`,
       accessor: 'land_acquired',
       className: 'text-right font-mono text-emerald-800 font-semibold',
       render: (row) => `${row.land_acquired} Ha`
     },
     {
-      header: 'Progress %',
+      header: t('dashboard.acquisitionProgress'),
       accessor: 'acquisition_percentage',
       className: 'text-center',
       render: (row) => (
@@ -138,63 +140,67 @@ export default function CentralDashboard() {
       render: (row) => `${row.proposed_area} Ha`
     },
     {
-      header: 'Current Status',
+      header: 'Delayed Stage',
       render: (row) => <StatusBadge status={row.status} />
+    },
+    {
+      header: 'Bottleneck Reason',
+      accessor: 'delay_reason',
+      render: (row) => <span className="text-xs text-rose-700 font-medium">{row.delay_reason || 'Pending State Approval'}</span>
     }
   ];
 
   return (
     <DashboardLayout>
-      <Breadcrumbs items={[{ label: 'Central Ministry', path: '/central/dashboard' }, { label: 'National Executive Dashboard' }]} />
+      <Breadcrumbs items={[{ label: t('nav.dashboard') }, { label: t('roles.CENTRAL_MINISTRY') }]} />
 
-      {/* Header Banner */}
+      {/* Official Government Header Banner */}
       <div className="bg-white border border-slate-200 p-5 rounded mb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <div className="flex items-center gap-2">
             <span className="bg-[#FF6B00] text-white text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider">
-              National Apex PMU
+              {t('dashboard.executiveScope')}
             </span>
-            <span className="text-xs text-slate-500">• All India Geographic Scope</span>
+            <span className="text-xs text-slate-500">• MoRTH / MoRD National PMU</span>
           </div>
           <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mt-1">
-            National Land Acquisition Executive Dashboard
+            {t('dashboard.title')}
           </h2>
           <p className="text-xs text-slate-600">
-            Real-time inter-ministerial consolidation of major infrastructure corridors, state clearances, and disbursement progress.
+            {t('dashboard.subtitle')}
           </p>
         </div>
 
-        <div className="flex items-center gap-2.5">
+        <div className="flex items-center gap-3">
           <button
             onClick={fetchStats}
             disabled={refreshing}
-            className="gov-btn-secondary text-xs"
-            title="Refresh statistics"
+            className="gov-btn-secondary text-xs cursor-pointer"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? 'animate-spin text-orange-600' : ''}`} />
-            <span>{refreshing ? 'Refreshing...' : 'Live Refresh'}</span>
+            <span>{refreshing ? t('common.refreshing') : t('common.liveRefresh')}</span>
           </button>
         </div>
       </div>
 
       {loading ? (
-        <div className="py-16 text-center">
+        <div className="py-20 text-center">
           <div className="w-8 h-8 border-3 border-orange-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
-          <p className="mt-3 text-xs font-semibold text-slate-600">Aggregating National Acquisition Metrics...</p>
+          <p className="mt-3 text-xs font-semibold text-slate-600">{t('dashboard.aggregatingStats')}</p>
         </div>
       ) : (
         <>
-          {/* Top 11 Government KPI Summary Cards */}
+          {/* Top 12-Card Executive Matrix */}
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3.5 mb-6">
             <StatCard
-              title="Total Projects"
+              title={t('dashboard.totalProjects')}
               value={summary.total_projects || 0}
-              subtitle="National Projects"
+              subtitle={t('dashboard.activeCorridors')}
               icon={Building2}
               colorScheme="blue"
             />
             <StatCard
-              title="Land Proposed"
+              title={t('dashboard.landProposed')}
               value={summary.total_land_proposed || '0.00'}
               unit="Ha"
               subtitle="Total RoW Required"
@@ -202,7 +208,7 @@ export default function CentralDashboard() {
               colorScheme="orange"
             />
             <StatCard
-              title="Land Acquired"
+              title={t('dashboard.landAcquired')}
               value={summary.total_land_acquired || '0.00'}
               unit="Ha"
               subtitle="Possession in Progress"
@@ -210,7 +216,7 @@ export default function CentralDashboard() {
               colorScheme="green"
             />
             <StatCard
-              title="Acquisition %"
+              title={t('dashboard.acquisitionProgress')}
               value={`${summary.acquisition_percentage || '0.0'}%`}
               subtitle="National Average"
               icon={TrendingUp}
@@ -218,7 +224,7 @@ export default function CentralDashboard() {
               trend="Target: 80%"
             />
             <StatCard
-              title="Comp. Assessed"
+              title={t('dashboard.compAssessed')}
               value={`₹${summary.compensation_assessed_cr || '0.00'}`}
               unit="Cr"
               subtitle="Estimated Award"
@@ -226,7 +232,7 @@ export default function CentralDashboard() {
               colorScheme="blue"
             />
             <StatCard
-              title="Comp. Disbursed"
+              title={t('dashboard.compDisbursed')}
               value={`₹${summary.compensation_paid_cr || '0.00'}`}
               unit="Cr"
               subtitle="Direct DBT to Escrow"
@@ -234,14 +240,14 @@ export default function CentralDashboard() {
               colorScheme="green"
             />
             <StatCard
-              title="Affected Families"
+              title={t('dashboard.affectedFamilies')}
               value={summary.affected_families?.toLocaleString('en-IN') || 0}
               subtitle="Titleholders Mapped"
               icon={Users}
               colorScheme="blue"
             />
             <StatCard
-              title="Displaced Families"
+              title={t('dashboard.displacedFamilies')}
               value={summary.displaced_families?.toLocaleString('en-IN') || 0}
               subtitle="R&R Required"
               icon={Users}
