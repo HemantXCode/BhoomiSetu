@@ -8,9 +8,9 @@ void main() {
     test('Pune Ring Road Corridor metrics and dynamic progress percentage', () {
       final ringRoad = ProjectCorridorDemoData.puneRingRoadCorridor;
 
-      expect(ringRoad.name, 'Pune Ring Road Corridor');
+      expect(ringRoad.name, 'Pune Ring Road Express Corridor (Phase-I)');
       expect(ringRoad.type, 'Highway');
-      expect(ringRoad.totalLandRequired, 485.5);
+      expect(ringRoad.totalLandRequired, 485.50);
       expect(ringRoad.acquiredLand, 289.28);
       expect(ringRoad.inProgressLand, 96.20);
       expect(ringRoad.pendingLand, 100.02);
@@ -36,7 +36,7 @@ void main() {
     test('Pune-Nashik Rail Corridor metrics and dynamic progress percentage', () {
       final railCorridor = ProjectCorridorDemoData.puneNashikRailCorridor;
 
-      expect(railCorridor.name, 'Pune-Nashik Rail Corridor');
+      expect(railCorridor.name, 'Pune-Nashik Semi-High Speed Rail Corridor');
       expect(railCorridor.type, 'Railway');
       expect(railCorridor.totalLandRequired, 720.0);
       expect(railCorridor.acquiredLand, 430.0);
@@ -81,7 +81,7 @@ void main() {
 
       final single = await repo.getCorridorById('PRJ-MH-PUN-001');
       expect(single, isNotNull);
-      expect(single!.name, 'Pune Ring Road Corridor');
+      expect(single!.name, 'Pune Ring Road Express Corridor (Phase-I)');
     });
 
     test('ProjectCorridorModel JSON serialization roundtrip for future API compatibility', () {

@@ -109,7 +109,14 @@ final notificationRepositoryProvider = Provider<INotificationRepository>((ref) {
 });
 
 final projectCorridorRepositoryProvider = Provider<IProjectCorridorRepository>((ref) {
-  return DemoProjectCorridorRepository();
+  final mode = ref.watch(dataModeProvider);
+  final apiClient = ref.watch(apiClientProvider);
+  final demoRepo = DemoProjectCorridorRepository();
+  if (mode == DataMode.mock) {
+    return demoRepo;
+  } else {
+    return ApiProjectCorridorRepository(apiClient: apiClient, fallback: demoRepo);
+  }
 });
 
 // Connectivity State Provider
